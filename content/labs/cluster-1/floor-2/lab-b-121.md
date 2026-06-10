@@ -1,0 +1,23 @@
+---
+room_id: "lab-b-121"
+name: "Applied Physics Research Lab"
+building_id: "cluster-1"
+floor: 2
+departments:
+  - "Applied Physics"
+head_of_lab:
+  name: "Dr. Nguyen Van A"
+  email: "a.nguyen@vgu.edu.vn"
+  office: "B-210"
+status: "active"
+highlighted_equipment:
+  - "laser-spectrometer-coher"
+---
+
+::lab-overview
+Focuses on advanced optics, photonics, laser spectroscopy, and solid-state physics applications.
+::
+
+### Safety Rules
+1. Always wear appropriate laser safety goggles corresponding to the operational wavelength.
+2. Do not look directly into the laser beam path.

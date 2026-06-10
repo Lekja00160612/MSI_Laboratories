@@ -1,0 +1,590 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "id": "room-lab-b-121",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              106.6148919,
+              11.1087818
+            ],
+            [
+              106.615059974,
+              11.108841536
+            ],
+            [
+              106.615215574,
+              11.108420174
+            ],
+            [
+              106.6150475,
+              11.1083604
+            ],
+            [
+              106.6148919,
+              11.1087818
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "room_id": "lab-b-121",
+        "name": "Applied Physics Research Lab",
+        "type": "laboratory",
+        "department": "Applied Physics",
+        "building_id": "cluster-1",
+        "level": 2
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "room-corridor-b-120",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              106.615059974,
+              11.108841536
+            ],
+            [
+              106.615166126,
+              11.108879263999999
+            ],
+            [
+              106.615321726,
+              11.108457926
+            ],
+            [
+              106.615215574,
+              11.108420174
+            ],
+            [
+              106.615059974,
+              11.108841536
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "room_id": "corridor-b-120",
+        "name": "Cluster 1 Level 2 Corridor",
+        "type": "corridor",
+        "department": "General Education",
+        "building_id": "cluster-1",
+        "level": 2
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "room-lab-b-122",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              106.615166126,
+              11.108879263999999
+            ],
+            [
+              106.6153342,
+              11.108939
+            ],
+            [
+              106.6154898,
+              11.1085177
+            ],
+            [
+              106.615321726,
+              11.108457926
+            ],
+            [
+              106.615166126,
+              11.108879263999999
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "room_id": "lab-b-122",
+        "name": "Chemistry Research Lab",
+        "type": "laboratory",
+        "department": "Chemistry",
+        "building_id": "cluster-1",
+        "level": 2
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "room-lab-c-201",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              106.6150966,
+              11.1082168
+            ],
+            [
+              106.61526513,
+              11.108277524
+            ],
+            [
+              106.615378054,
+              11.10797436
+            ],
+            [
+              106.6152096,
+              11.1079147
+            ],
+            [
+              106.6150966,
+              11.1082168
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "room_id": "lab-c-201",
+        "name": "High Performance Computing Lab",
+        "type": "laboratory",
+        "department": "Computer Science",
+        "building_id": "cluster-2",
+        "level": 2
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "room-corridor-c-200",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              106.61526513,
+              11.108277524
+            ],
+            [
+              106.61537157000001,
+              11.108315875999999
+            ],
+            [
+              106.615484446,
+              11.10801204
+            ],
+            [
+              106.615378054,
+              11.10797436
+            ],
+            [
+              106.61526513,
+              11.108277524
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "room_id": "corridor-c-200",
+        "name": "Cluster 2 Level 2 Hallway",
+        "type": "corridor",
+        "department": "General Education",
+        "building_id": "cluster-2",
+        "level": 2
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "room-lab-c-202",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              106.61537157000001,
+              11.108315875999999
+            ],
+            [
+              106.6155401,
+              11.1083766
+            ],
+            [
+              106.6156529,
+              11.1080717
+            ],
+            [
+              106.615484446,
+              11.10801204
+            ],
+            [
+              106.61537157000001,
+              11.108315875999999
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "room_id": "lab-c-202",
+        "name": "VLSI Design Lab",
+        "type": "laboratory",
+        "department": "Electrical Engineering",
+        "building_id": "cluster-2",
+        "level": 2
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "room-lab-d-201",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              106.6152701,
+              11.1077897
+            ],
+            [
+              106.61543825,
+              11.107850728
+            ],
+            [
+              106.615552388,
+              11.10754769
+            ],
+            [
+              106.6153842,
+              11.1074867
+            ],
+            [
+              106.6152701,
+              11.1077897
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "room_id": "lab-d-201",
+        "name": "Fluid Dynamics Lab",
+        "type": "laboratory",
+        "department": "Mechanical Engineering",
+        "building_id": "cluster-3",
+        "level": 2
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "room-corridor-d-200",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              106.61543825,
+              11.107850728
+            ],
+            [
+              106.61554445,
+              11.107889272
+            ],
+            [
+              106.61565861199999,
+              11.107586210000001
+            ],
+            [
+              106.615552388,
+              11.10754769
+            ],
+            [
+              106.61543825,
+              11.107850728
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "room_id": "corridor-d-200",
+        "name": "Cluster 3 Level 2 Hallway",
+        "type": "corridor",
+        "department": "General Education",
+        "building_id": "cluster-3",
+        "level": 2
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "room-lab-d-202",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              106.61554445,
+              11.107889272
+            ],
+            [
+              106.6157126,
+              11.1079503
+            ],
+            [
+              106.6158268,
+              11.1076472
+            ],
+            [
+              106.61565861199999,
+              11.107586210000001
+            ],
+            [
+              106.61554445,
+              11.107889272
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "room_id": "lab-d-202",
+        "name": "CAD/CAM Design Center",
+        "type": "laboratory",
+        "department": "Mechanical Engineering",
+        "building_id": "cluster-3",
+        "level": 2
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "room-lab-b-201",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              106.6155694,
+              11.1090232
+            ],
+            [
+              106.615744884,
+              11.109085558
+            ],
+            [
+              106.615941946,
+              11.108551858
+            ],
+            [
+              106.6157665,
+              11.1084895
+            ],
+            [
+              106.6155694,
+              11.1090232
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "room_id": "lab-b-201",
+        "name": "Microscopy Center",
+        "type": "laboratory",
+        "department": "Materials Science",
+        "building_id": "cluster-5",
+        "level": 2
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "room-corridor-b-200",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              106.615744884,
+              11.109085558
+            ],
+            [
+              106.615855716,
+              11.109124942
+            ],
+            [
+              106.616052754,
+              11.108591242
+            ],
+            [
+              106.615941946,
+              11.108551858
+            ],
+            [
+              106.615744884,
+              11.109085558
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "room_id": "corridor-b-200",
+        "name": "Cluster 5 Level 2 Lobby",
+        "type": "corridor",
+        "department": "General Education",
+        "building_id": "cluster-5",
+        "level": 2
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "room-lab-b-204",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              106.615855716,
+              11.109124942
+            ],
+            [
+              106.6160312,
+              11.1091873
+            ],
+            [
+              106.6162282,
+              11.1086536
+            ],
+            [
+              106.616052754,
+              11.108591242
+            ],
+            [
+              106.615855716,
+              11.109124942
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "room_id": "lab-b-204",
+        "name": "Computational Physics Lab",
+        "type": "laboratory",
+        "department": "Applied Physics",
+        "building_id": "cluster-5",
+        "level": 2
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "room-lab-f-201",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              106.6158383,
+              11.1083158
+            ],
+            [
+              106.616007438,
+              11.108376068
+            ],
+            [
+              106.616181876,
+              11.107904529999999
+            ],
+            [
+              106.6160127,
+              11.1078443
+            ],
+            [
+              106.6158383,
+              11.1083158
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "room_id": "lab-f-201",
+        "name": "Case Study Room",
+        "type": "laboratory",
+        "department": "Business Administration",
+        "building_id": "cluster-6",
+        "level": 2
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "room-corridor-f-200",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              106.616007438,
+              11.108376068
+            ],
+            [
+              106.616114262,
+              11.108414132
+            ],
+            [
+              106.616288724,
+              11.10794257
+            ],
+            [
+              106.616181876,
+              11.107904529999999
+            ],
+            [
+              106.616007438,
+              11.108376068
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "room_id": "corridor-f-200",
+        "name": "Cluster 6 Level 2 Corridor",
+        "type": "corridor",
+        "department": "General Education",
+        "building_id": "cluster-6",
+        "level": 2
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "room-room-f-202",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              106.616114262,
+              11.108414132
+            ],
+            [
+              106.6162834,
+              11.1084744
+            ],
+            [
+              106.6164579,
+              11.1080028
+            ],
+            [
+              106.616288724,
+              11.10794257
+            ],
+            [
+              106.616114262,
+              11.108414132
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "room_id": "room-f-202",
+        "name": "MBA Seminar Room",
+        "type": "laboratory",
+        "department": "Business Administration",
+        "building_id": "cluster-6",
+        "level": 2
+      }
+    }
+  ]
+}

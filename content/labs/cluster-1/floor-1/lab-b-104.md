@@ -1,0 +1,26 @@
+---
+room_id: "lab-b-104"
+name: "Advanced Materials Characterization Lab"
+building_id: "cluster-1"
+floor: 1
+departments:
+  - "Materials Science and Engineering"
+  - "Applied Physics"
+head_of_lab:
+  name: "Dr. Nguyen Van A"
+  email: "a.nguyen@vgu.edu.vn"
+  office: "B-105"
+status: "active"
+highlighted_equipment:
+  - "xrd-bruker-d8"
+  - "sem-jeol-it500"
+---
+
+::lab-overview
+This laboratory focuses on structural analysis, microscopy, and phase determination for materials engineering students and researchers.
+::
+
+### Safety & Access Rules
+1. Closed-toe shoes and safety glasses are mandatory at all times.
+2. Fume hoods must be active during all chemical reactions.
+3. Access is restricted to certified MSI research students and staff.

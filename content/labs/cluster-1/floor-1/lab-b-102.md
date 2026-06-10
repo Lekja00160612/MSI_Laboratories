@@ -1,0 +1,29 @@
+---
+room_id: "lab-b-102"
+name: "Polymer Characterization Lab"
+building_id: "cluster-1"
+floor: 1
+departments:
+  - "Chemical Engineering"
+  - "Materials Science and Engineering"
+head_of_lab:
+  name: "Dr. Tran Van B"
+  email: "b.tran@vgu.edu.vn"
+  office: "B-103"
+status: "active"
+highlighted_equipment:
+  - "furnace-carbolite"
+  - "laser-spectrometer-coher"
+  - "hplc-agilent-1260"
+---
+
+::lab-overview
+This laboratory focuses on polymer characterization, thermal processing, and high-performance chemical compound separation. It serves as VGU's primary facility for synthesis and phase change measurement of synthetic polymers, elastomers, resin matrices, and semiconductor thin-film coatings.
+
+Researchers utilize advanced thermal processing furnaces to sinter alloy structures and bake substrates, laser spectrometers to capture sub-picosecond optoelectronic dynamics, and liquid phase chromatographs to separate compound ingredients under extreme pressures. The facility supports comprehensive material science research, applied physics instrumentation, and chemistry methodologies.
+::
+
+### Safety Rules & Access Guidelines
+1. Personal Protective Equipment (PPE) is mandatory: high-temperature insulated safety gloves, lab coats, and safety goggles.
+2. Verify ventilation filters, cooling lines, and gas flow regulators before firing any high-temperature furnaces.
+3. Access is restricted to authorized researchers and certified student operators. All run hours must be logged.

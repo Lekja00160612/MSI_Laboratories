@@ -1,0 +1,23 @@
+---
+room_id: "lab-e-101"
+name: "Concrete & Materials Testing Lab"
+building_id: "cluster-5"
+floor: 1
+departments:
+  - "Civil Engineering"
+head_of_lab:
+  name: "Dr. Phan Van L"
+  email: "l.phan@vgu.edu.vn"
+  office: "E-110"
+status: "active"
+highlighted_equipment:
+  - "concrete-compression-tester"
+---
+
+::lab-overview
+Dedicated to civil engineering material tests, concrete batching, curing, and load/stress testing.
+::
+
+### Safety Rules
+1. Dust masks must be worn when mixing dry concrete components.
+2. Wear steel-toed shoes when handling concrete samples or weights.
