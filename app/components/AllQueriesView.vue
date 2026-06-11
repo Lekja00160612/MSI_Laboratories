@@ -49,79 +49,97 @@
 
         <!-- Collapsible Departments Filter -->
         <div class="flex flex-col gap-3">
-          <button 
-            @click="collapseDept = !collapseDept"
-            class="flex items-center justify-between font-technical text-[10px] uppercase font-bold text-white/40 tracking-wider hover:text-white transition-colors"
-          >
-            <span>Filter Departments</span>
-            <span class="text-xs">{{ collapseDept ? '＋' : '－' }}</span>
-          </button>
-          <div v-show="!collapseDept" class="flex flex-col gap-2.5 pl-1 max-h-48 overflow-y-auto pr-1">
-            <UCheckbox
-              v-for="dept in departments"
-              :key="dept"
-              :label="dept"
-              :model-value="selectedDepartments.includes(dept)"
-              @update:model-value="(checked) => toggleDepartment(dept, checked)"
-              class="text-xs text-white/80"
-              color="primary"
-            />
-          </div>
+          <UCollapsible v-model:open="collapseDept" class="w-full">
+            <template #default="{ open }">
+              <UButton 
+                color="neutral"
+                variant="ghost"
+                class="w-full justify-between px-0 font-technical text-[10px] uppercase font-bold text-white/50 hover:text-white hover:bg-transparent"
+                :trailing-icon="open ? 'i-lucide-chevron-up' : 'i-lucide-chevron-down'"
+                label="Filter Departments"
+              />
+            </template>
+            <template #content>
+              <div class="flex flex-col gap-2.5 pl-1 max-h-48 overflow-y-auto pr-1 py-2">
+                <UCheckbox
+                  v-for="dept in departments"
+                  :key="dept"
+                  :label="dept"
+                  :model-value="selectedDepartments.includes(dept)"
+                  @update:model-value="(checked) => toggleDepartment(dept, checked)"
+                  class="text-xs text-white/80"
+                  color="primary"
+                />
+              </div>
+            </template>
+          </UCollapsible>
         </div>
 
         <!-- Collapsible Categories Filter -->
         <div class="flex flex-col gap-3 border-t border-white/5 pt-4">
-          <button 
-            @click="collapseCat = !collapseCat"
-            class="flex items-center justify-between font-technical text-[10px] uppercase font-bold text-white/40 tracking-wider hover:text-white transition-colors"
-          >
-            <span>Filter Categories</span>
-            <span class="text-xs">{{ collapseCat ? '＋' : '－' }}</span>
-          </button>
-          <div v-show="!collapseCat" class="flex flex-col gap-2.5 pl-1 max-h-48 overflow-y-auto pr-1">
-            <UCheckbox
-              v-for="cat in categories"
-              :key="cat"
-              :label="cat"
-              :model-value="selectedCategories.includes(cat)"
-              @update:model-value="(checked) => toggleCategory(cat, checked)"
-              class="text-xs text-white/80"
-              color="primary"
-            />
-          </div>
+          <UCollapsible v-model:open="collapseCat" class="w-full">
+            <template #default="{ open }">
+              <UButton 
+                color="neutral"
+                variant="ghost"
+                class="w-full justify-between px-0 font-technical text-[10px] uppercase font-bold text-white/50 hover:text-white hover:bg-transparent"
+                :trailing-icon="open ? 'i-lucide-chevron-up' : 'i-lucide-chevron-down'"
+                label="Filter Categories"
+              />
+            </template>
+            <template #content>
+              <div class="flex flex-col gap-2.5 pl-1 max-h-48 overflow-y-auto pr-1 py-2">
+                <UCheckbox
+                  v-for="cat in categories"
+                  :key="cat"
+                  :label="cat"
+                  :model-value="selectedCategories.includes(cat)"
+                  @update:model-value="(checked) => toggleCategory(cat, checked)"
+                  class="text-xs text-white/80"
+                  color="primary"
+                />
+              </div>
+            </template>
+          </UCollapsible>
         </div>
 
         <!-- Collapsible Rooms Filter -->
         <div class="flex flex-col gap-3 border-t border-white/5 pt-4">
-          <button 
-            @click="collapseRoom = !collapseRoom"
-            class="flex items-center justify-between font-technical text-[10px] uppercase font-bold text-white/40 tracking-wider hover:text-white transition-colors"
-          >
-            <span>Filter Rooms</span>
-            <span class="text-xs">{{ collapseRoom ? '＋' : '－' }}</span>
-          </button>
-          <div v-show="!collapseRoom" class="flex flex-col gap-2.5 pl-1">
-            <UInput 
-              v-model="roomSearchQuery" 
-              placeholder="Search room..." 
-              size="xs"
-              color="neutral"
-              variant="outline"
-              icon="i-lucide-search"
-              class="mb-1 w-full"
-            />
-            <div class="flex flex-col gap-2.5 max-h-48 overflow-y-auto pr-1">
-              <UCheckbox
-                v-for="room in filteredRoomOptions"
-                :key="room.value"
-                :label="room.label"
-                :model-value="selectedRooms.includes(room.value)"
-                @update:model-value="(checked) => toggleRoom(room.value, checked)"
-                class="text-xs text-white/80"
-                color="primary"
+          <UCollapsible v-model:open="collapseRoom" class="w-full">
+            <template #default="{ open }">
+              <UButton 
+                color="neutral"
+                variant="ghost"
+                class="w-full justify-between px-0 font-technical text-[10px] uppercase font-bold text-white/50 hover:text-white hover:bg-transparent"
+                :trailing-icon="open ? 'i-lucide-chevron-up' : 'i-lucide-chevron-down'"
+                label="Filter Rooms"
               />
-            </div>
-          </div>
+            </template>
+            <template #content>
+              <div class="flex flex-col gap-2.5 pl-1 py-2">
+                <UInput 
+                  v-model="roomSearchQuery" 
+                  placeholder="Search room..." 
+                  size="xs"
+                  color="neutral"
+                  variant="outline"
+                  icon="i-lucide-search"
+                  class="mb-2 w-full"
+                />
+                <div class="flex flex-col gap-2.5 max-h-48 overflow-y-auto pr-1">
+                  <UCheckbox
+                    v-for="room in filteredRoomOptions"
+                    :key="room.value"
+                    :label="room.label"
+                    :model-value="selectedRooms.includes(room.value)"
+                    @update:model-value="(checked) => toggleRoom(room.value, checked)"
+                    class="text-xs text-white/80"
+                    color="primary"
+                  />
+                </div>
+              </div>
+            </template>
+          </UCollapsible>
         </div>
       </aside>
 
@@ -228,9 +246,9 @@ const selectedRooms = ref([])
 
 const roomSearchQuery = ref('')
 
-const collapseDept = ref(false)
-const collapseCat = ref(false)
-const collapseRoom = ref(false)
+const collapseDept = ref(true)
+const collapseCat = ref(true)
+const collapseRoom = ref(true)
 
 // Active filter state check
 const hasActiveFilters = computed(() => {

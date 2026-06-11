@@ -1,7 +1,13 @@
 <template>
   <div class="relative w-full h-full">
-    <!-- Map Container -->
-    <div ref="mapContainer" class="w-full h-full rounded-lg overflow-hidden border border-[#EF5A24]/10 shadow-2xl"></div>
+    <!-- Map Container with Zoom-dependent Class -->
+    <div 
+      ref="mapContainer" 
+      :class="[
+        'w-full h-full rounded-lg overflow-hidden border border-[#EF5A24]/10 shadow-2xl transition-all duration-300',
+        { 'map-zoomed-in': zoomLevel <= 18 }
+      ]"
+    ></div>
 
     <!-- Unified Top Context HUD Bar -->
     <div class="absolute top-6 left-1/2 -translate-x-1/2 z-20 w-[90%] max-w-xl pointer-events-none">
@@ -98,14 +104,31 @@ const emit = defineEmits(['select-building', 'select-floor', 'select-room', 'res
 
 const mapContainer = ref(null)
 let map = null
+const mapLoaded = ref(false)
 
 const zoomLevel = ref(16.5)
 const pitchLevel = ref(45)
 const mapCenter = ref([106.6155, 11.1083])
-const floors = [2, 1] // Available floors in Block B
+const floorsConfig = ref({})
+const floors = computed(() => {
+  if (!props.selectedBuilding || !floorsConfig.value) return [2, 1]
+  return floorsConfig.value[props.selectedBuilding] || [2, 1]
+})
+
+const config = useRuntimeConfig()
+const displayOnlyRoomsWithMachines = computed(() => config.public.displayOnlyRoomsWithMachines)
+
+const { data: labs } = await useAsyncData('map-labs', () => queryCollection('labs').all())
 
 // Initialize Map
-onMounted(() => {
+onMounted(async () => {
+  try {
+    const res = await fetch('/data/floorplans/floors-config.json')
+    floorsConfig.value = await res.json()
+  } catch (err) {
+    console.error('Failed to load floors config', err)
+  }
+
   if (!mapContainer.value) return
 
   map = new maplibregl.Map({
@@ -116,12 +139,12 @@ onMounted(() => {
         'osm-tiles': {
           type: 'raster',
           tiles: [
-            'https://a.tile.openstreetmap.org/{z}/{x}/{y}.png',
-            'https://b.tile.openstreetmap.org/{z}/{x}/{y}.png',
-            'https://c.tile.openstreetmap.org/{z}/{x}/{y}.png'
+            'https://a.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png',
+            'https://b.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png',
+            'https://c.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png'
           ],
           tileSize: 256,
-          attribution: '© OpenStreetMap contributors',
+          attribution: '© OpenStreetMap contributors, © CartoDB',
           maxzoom: 19
         }
       },
@@ -140,6 +163,10 @@ onMounted(() => {
     pitch: 45,
     bearing: -20
   })
+  if (typeof window !== 'undefined') {
+    window.map = map
+  }
+
 
   // Listen to camera events for UI display
   map.on('zoom', () => {
@@ -154,6 +181,7 @@ onMounted(() => {
   })
 
   map.on('load', () => {
+    mapLoaded.value = true
     // Add VGU Buildings Shell Data
     map.addSource('vgu-buildings', {
       type: 'geojson',
@@ -183,6 +211,33 @@ onMounted(() => {
         'line-width': 1.5,
         'line-opacity': 0.6
       }
+    })
+
+    // Add 3D building extrusion for selected building (highly translucent/holographic X-ray shell)
+    map.addLayer({
+      id: 'vgu-selected-building-extrusion',
+      type: 'fill-extrusion',
+      source: 'vgu-buildings',
+      paint: {
+        'fill-extrusion-color': '#0C2B5C',
+        'fill-extrusion-height': ['get', 'height'],
+        'fill-extrusion-base': ['get', 'base_height'],
+        'fill-extrusion-opacity': 0.1
+      },
+      filter: ['==', ['get', 'building_id'], '']
+    })
+
+    // Glowing outline for selected building
+    map.addLayer({
+      id: 'vgu-selected-building-outline',
+      type: 'line',
+      source: 'vgu-buildings',
+      paint: {
+        'line-color': '#EF5A24',
+        'line-width': 3.0,
+        'line-opacity': 0.9
+      },
+      filter: ['==', ['get', 'building_id'], '']
     })
 
     // Add empty source for Floorplans to be loaded dynamically
@@ -271,6 +326,9 @@ onMounted(() => {
     if (props.selectedBuilding) {
       map.setFilter('vgu-buildings-extrusion', ['!=', ['get', 'building_id'], props.selectedBuilding])
       map.setFilter('vgu-buildings-outline', ['!=', ['get', 'building_id'], props.selectedBuilding])
+      map.setFilter('vgu-selected-building-extrusion', ['==', ['get', 'building_id'], props.selectedBuilding])
+      map.setFilter('vgu-selected-building-outline', ['==', ['get', 'building_id'], props.selectedBuilding])
+      
       map.setFilter('vgu-rooms-fill', ['==', ['get', 'building_id'], props.selectedBuilding])
       map.setFilter('vgu-rooms-outline', ['==', ['get', 'building_id'], props.selectedBuilding])
       
@@ -318,15 +376,20 @@ function renderClusterLabels() {
 
   clusters.forEach(c => {
     const el = document.createElement('div')
-    el.className = 'absolute transform -translate-x-1/2 -translate-y-1/2 flex flex-col items-center pointer-events-auto cursor-pointer transition-all duration-300'
+    // Outer container is a 0x0 absolute point so that coordinates are locked
+    el.className = 'relative w-0 h-0 cursor-pointer pointer-events-auto'
     el.innerHTML = `
-      <div class="flex flex-col items-center group">
-        <!-- Cluster Node Tag -->
-        <div class="px-3.5 py-2 rounded bg-[#0F1E36]/95 border border-[#06B6D4]/30 hover:border-[#EF5A24] text-white shadow-xl backdrop-blur-md transition-all duration-300 group-hover:scale-105 text-center min-w-[130px]">
-          <div class="text-[10px] font-technical font-extrabold text-[#EF5A24] uppercase tracking-wider">${c.label}</div>
-          <div class="text-[8px] text-white/60 font-sans mt-0.5 leading-tight">${c.name}</div>
-          <div class="text-[8px] font-technical text-[#06B6D4] mt-1.5 uppercase font-bold tracking-widest animate-pulse">ENTER BLOCK →</div>
-        </div>
+      <!-- Pulsing Dot (locked exactly at 0,0) -->
+      <div class="cluster-marker-dot absolute -translate-x-1/2 -translate-y-1/2 w-4 h-4 flex items-center justify-center pointer-events-auto">
+        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#EF5A24] opacity-75"></span>
+        <span class="relative inline-flex rounded-full h-2 w-2 bg-[#EF5A24] shadow-[0_0_8px_#EF5A24]"></span>
+      </div>
+      
+      <!-- Cluster Card (positioned relative to the dot, 0x0 offset layout) -->
+      <div class="cluster-marker-card absolute top-4 left-1/2 -translate-x-1/2 px-3.5 py-2 rounded bg-[#0F1E36]/95 border border-[#06B6D4]/30 hover:border-[#EF5A24] text-white shadow-xl backdrop-blur-md transition-all duration-300 hover:scale-105 text-center min-w-[140px] pointer-events-auto">
+        <div class="text-[10px] font-technical font-extrabold text-[#EF5A24] uppercase tracking-wider">${c.label}</div>
+        <div class="text-[8px] text-white/60 font-sans mt-0.5 leading-tight">${c.name}</div>
+        <div class="text-[8px] font-technical text-[#06B6D4] mt-1.5 uppercase font-bold tracking-widest animate-pulse">ENTER BLOCK →</div>
       </div>
     `
 
@@ -363,12 +426,20 @@ function getPolygonCentroid(coordinates) {
 }
 
 async function loadFloorplan(floorNum) {
-  if (!map || !map.isStyleLoaded()) return
+  console.log('loadFloorplan called with:', floorNum)
+  if (!map || !mapLoaded.value) {
+    console.log('loadFloorplan aborted: map is not loaded yet')
+    return
+  }
   try {
-    const res = await fetch(`/data/floorplans/msi-floor${floorNum}.json`)
+    const url = `/data/floorplans/msi-floor${floorNum}.json`
+    console.log('loadFloorplan: fetching from', url)
+    const res = await fetch(url)
     const data = await res.json()
+    console.log('loadFloorplan: fetched features count:', data.features ? data.features.length : 'no features')
     const source = map.getSource('vgu-floorplan')
     if (source) {
+      console.log('loadFloorplan: source found, setting data')
       source.setData(data)
       map.setLayoutProperty('vgu-rooms-fill', 'visibility', 'visible')
       map.setLayoutProperty('vgu-rooms-outline', 'visibility', 'visible')
@@ -379,27 +450,40 @@ async function loadFloorplan(floorNum) {
 
     // Add HTML markers for rooms inside the selected building
     if (props.selectedBuilding) {
-      const bRooms = data.features.filter(f => f.properties.building_id === props.selectedBuilding)
+      let bRooms = data.features.filter(f => f.properties.building_id === props.selectedBuilding)
+      
+      // Filter rooms depending on displayOnlyRoomsWithMachines option
+      if (displayOnlyRoomsWithMachines.value) {
+        const labRoomIds = new Set((labs.value || []).map(l => l.room_id))
+        bRooms = bRooms.filter(room => labRoomIds.has(room.properties.room_id))
+      } else {
+        // Exclude corridors, service nodes from overlay markers to keep map clean
+        bRooms = bRooms.filter(room => 
+          !['corridor', 'stairwell', 'elevator', 'service', 'lobby', 'terrace', 'courtyard'].includes(room.properties.type)
+        )
+      }
+
       bRooms.forEach(room => {
         const centroid = getPolygonCentroid(room.geometry.coordinates)
         const roomId = room.properties.room_id.replace('lab-', '').replace('room-', '').toUpperCase()
-        const roomName = room.properties.name
+        
+        // Find matching name in labs collection
+        const matchingLab = (labs.value || []).find(l => l.room_id === room.properties.room_id)
+        const roomName = matchingLab ? matchingLab.name : room.properties.name
 
-        // Create HTML element for the marker
+        // Create HTML element for the marker (absolute 0x0 centering)
         const el = document.createElement('div')
-        el.className = 'absolute transform -translate-x-1/2 -translate-y-1/2 flex flex-col items-center pointer-events-auto transition-all duration-300'
+        el.className = 'relative w-0 h-0 cursor-pointer pointer-events-auto'
         el.innerHTML = `
-          <div class="flex flex-col items-center group cursor-pointer">
-            <!-- Pulsing Dot -->
-            <div class="relative w-3.5 h-3.5 flex items-center justify-center">
-              <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#EF5A24] opacity-75"></span>
-              <span class="relative inline-flex rounded-full h-2 w-2 bg-[#EF5A24]"></span>
-            </div>
-            <!-- Label Tag -->
-            <div class="mt-2 px-3 py-1.5 rounded bg-[#0F1E36]/95 border border-[#EF5A24]/30 hover:border-[#EF5A24] text-white shadow-lg backdrop-blur-sm transition-all duration-300 group-hover:scale-105 text-center max-w-[140px] pointer-events-auto">
-              <div class="text-[10px] font-technical font-extrabold text-[#EF5A24] uppercase tracking-wider">${roomId}</div>
-              <div class="text-[9px] text-white/80 font-sans leading-tight mt-0.5 line-clamp-2">${roomName}</div>
-            </div>
+          <!-- Pulsing Dot (locked exactly at 0,0) -->
+          <div class="absolute -translate-x-1/2 -translate-y-1/2 w-3.5 h-3.5 flex items-center justify-center pointer-events-auto">
+            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#EF5A24] opacity-75"></span>
+            <span class="relative inline-flex rounded-full h-2 w-2 bg-[#EF5A24] shadow-[0_0_6px_#EF5A24]"></span>
+          </div>
+          <!-- Label Tag (positioned below the dot, 0x0 offset layout) -->
+          <div class="absolute top-4 left-1/2 -translate-x-1/2 px-3 py-1.5 rounded bg-[#0F1E36]/95 border border-[#EF5A24]/30 hover:border-[#EF5A24] text-white shadow-lg backdrop-blur-sm transition-all duration-300 hover:scale-105 text-center min-w-[120px] max-w-[155px] pointer-events-auto">
+            <div class="text-[10px] font-technical font-extrabold text-[#EF5A24] uppercase tracking-wider">${roomId}</div>
+            <div class="text-[9px] text-white/80 font-sans leading-tight mt-0.5 line-clamp-2">${roomName}</div>
           </div>
         `
 
@@ -421,73 +505,76 @@ async function loadFloorplan(floorNum) {
   }
 }
 
-// Watch building selection to zoom and toggle layers
-watch(() => props.selectedBuilding, async (newBuilding) => {
-  if (!map || !map.isStyleLoaded()) return
+// Watch building selection and floor changes in sync to zoom and load floorplans
+watch([() => props.selectedBuilding, () => props.selectedFloor], async ([newBuilding, newFloor], [oldBuilding, oldFloor]) => {
+  console.log('VguMap Watch triggered:', { newBuilding, newFloor, oldBuilding, oldFloor })
+  if (!map || !mapLoaded.value) {
+    console.log('VguMap Watch aborted: map is not loaded yet')
+    return
+  }
 
   if (newBuilding) {
-    // Clear cluster labels
-    clearClusterMarkers()
+    if (newBuilding !== oldBuilding) {
+      // Clear cluster labels
+      clearClusterMarkers()
 
-    // Zoom into specific cluster
-    const coords = buildingCenters[newBuilding] || [106.6155, 11.1083]
-    map.flyTo({
-      center: coords,
-      zoom: 19.5,
-      pitch: 0, // Top down to explore floorplans
-      bearing: 0,
-      duration: 1500
-    })
+      // Zoom into specific cluster
+      const coords = buildingCenters[newBuilding] || [106.6155, 11.1083]
+      map.flyTo({
+        center: coords,
+        zoom: 19.5,
+        pitch: 0, // Top down to explore floorplans
+        bearing: 0,
+        duration: 1500
+      })
 
-    // Hide ONLY the selected building shell to reveal its interior (holographic/X-ray cutaway effect)
-    map.setFilter('vgu-buildings-extrusion', ['!=', ['get', 'building_id'], newBuilding])
-    map.setFilter('vgu-buildings-outline', ['!=', ['get', 'building_id'], newBuilding])
-    
-    // Set filters for room layers
-    map.setFilter('vgu-rooms-fill', ['==', ['get', 'building_id'], newBuilding])
-    map.setFilter('vgu-rooms-outline', ['==', ['get', 'building_id'], newBuilding])
+      // Update building filters (split layers setup)
+      map.setFilter('vgu-buildings-extrusion', ['!=', ['get', 'building_id'], newBuilding])
+      map.setFilter('vgu-buildings-outline', ['!=', ['get', 'building_id'], newBuilding])
+      map.setFilter('vgu-selected-building-extrusion', ['==', ['get', 'building_id'], newBuilding])
+      map.setFilter('vgu-selected-building-outline', ['==', ['get', 'building_id'], newBuilding])
+      
+      // Set filters for room layers
+      map.setFilter('vgu-rooms-fill', ['==', ['get', 'building_id'], newBuilding])
+      map.setFilter('vgu-rooms-outline', ['==', ['get', 'building_id'], newBuilding])
+    }
 
-    if (props.selectedFloor) {
-      await loadFloorplan(props.selectedFloor)
+    if (newFloor) {
+      await loadFloorplan(newFloor)
+    } else {
+      map.setLayoutProperty('vgu-rooms-fill', 'visibility', 'none')
+      map.setLayoutProperty('vgu-rooms-outline', 'visibility', 'none')
+      clearRoomMarkers()
     }
   } else {
-    // Zoom out to campus view
-    map.flyTo({
-      center: [106.6155, 11.1083],
-      zoom: 16.5,
-      pitch: 45,
-      bearing: -20,
-      duration: 1500
-    })
+    if (newBuilding !== oldBuilding) {
+      // Zoom out to campus view
+      map.flyTo({
+        center: [106.6155, 11.1083],
+        zoom: 16.5,
+        pitch: 45,
+        bearing: -20,
+        duration: 1500
+      })
 
-    // Restore all shells
-    map.setFilter('vgu-buildings-extrusion', null)
-    map.setFilter('vgu-buildings-outline', null)
-    
-    // Hide floorplan layers and reset filters
-    map.setFilter('vgu-rooms-fill', null)
-    map.setFilter('vgu-rooms-outline', null)
-    map.setLayoutProperty('vgu-rooms-fill', 'visibility', 'none')
-    map.setLayoutProperty('vgu-rooms-outline', 'visibility', 'none')
+      // Restore all shells and default opacities
+      map.setFilter('vgu-buildings-extrusion', null)
+      map.setFilter('vgu-buildings-outline', null)
+      map.setFilter('vgu-selected-building-extrusion', ['==', ['get', 'building_id'], ''])
+      map.setFilter('vgu-selected-building-outline', ['==', ['get', 'building_id'], ''])
+      
+      // Hide floorplan layers and reset filters
+      map.setFilter('vgu-rooms-fill', null)
+      map.setFilter('vgu-rooms-outline', null)
+      map.setLayoutProperty('vgu-rooms-fill', 'visibility', 'none')
+      map.setLayoutProperty('vgu-rooms-outline', 'visibility', 'none')
 
-    // Clear room HTML markers
-    clearRoomMarkers()
+      // Clear room HTML markers
+      clearRoomMarkers()
 
-    // Restore cluster labels
-    renderClusterLabels()
-  }
-})
-
-// Watch floor changes to reload room GeoJSON
-watch(() => props.selectedFloor, async (newFloor) => {
-  if (!map || !map.isStyleLoaded() || !props.selectedBuilding) return
-
-  if (newFloor) {
-    await loadFloorplan(newFloor)
-  } else {
-    // Hide floorplan layers
-    map.setLayoutProperty('vgu-rooms-fill', 'visibility', 'none')
-    map.setLayoutProperty('vgu-rooms-outline', 'visibility', 'none')
+      // Restore cluster labels
+      renderClusterLabels()
+    }
   }
 })
 
@@ -511,5 +598,17 @@ function resetMap() {
 }
 :deep(.maplibregl-popup-tip) {
   border-top-color: rgba(15, 30, 54, 0.9) !important;
+}
+
+/* Scoped zoom classes for cluster markers */
+:deep(.cluster-marker-dot) {
+  display: flex !important;
+}
+:deep(.cluster-marker-card) {
+  display: block !important;
+}
+
+:deep(.map-zoomed-in) .cluster-marker-card {
+  display: none !important;
 }
 </style>

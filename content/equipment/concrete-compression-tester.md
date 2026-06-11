@@ -8,7 +8,7 @@ departments:
 location:
   building_id: "cluster-5"
   floor: 1
-  room_id: "lab-e-101"
+  room_id: "b5-103"
   station_id: "station-civ-1"
 media:
   images:

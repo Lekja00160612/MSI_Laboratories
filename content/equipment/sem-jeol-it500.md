@@ -9,7 +9,7 @@ departments:
 location:
   building_id: "cluster-5"
   floor: 2
-  room_id: "lab-b-201"
+  room_id: "b5-203"
   station_id: "station-sem-1"
 media:
   images:

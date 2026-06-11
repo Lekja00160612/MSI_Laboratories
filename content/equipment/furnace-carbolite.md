@@ -9,7 +9,7 @@ departments:
 location:
   building_id: "cluster-1"
   floor: 1
-  room_id: "lab-b-102"
+  room_id: "b1-103"
   station_id: "station-furnace-1"
 media:
   images:

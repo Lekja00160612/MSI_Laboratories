@@ -55,54 +55,42 @@
               </p>
               <div class="flex flex-col gap-2.5 mt-2">
                 <button 
-                  @click="selectedBuilding = 'cluster-1'; selectedFloor = 1"
-                  class="flex items-center justify-between p-3 rounded-lg bg-[#0F1E36]/50 border border-white/5 hover:border-[#EF5A24]/40 hover:bg-[#EF5A24]/5 text-left text-xs transition-all duration-300"
+                  v-for="(tele, bId) in clusterTelemetry"
+                  :key="bId"
+                  @click="selectedBuilding = bId; selectedFloor = 1"
+                  class="relative flex items-center justify-between p-4 rounded-xl bg-[#0F1E36]/30 border border-white/10 hover:border-[#EF5A24] hover:bg-[#EF5A24]/5 hover:shadow-[0_0_15px_rgba(239,90,36,0.15)] text-left transition-all duration-300 group overflow-hidden"
                 >
-                  <div>
-                    <div class="font-bold text-white">Academic Cluster 1</div>
-                    <div class="text-[10px] text-white/50 mt-1">Materials Science, Physics, Chemistry</div>
+                  <!-- Cyber corner decorations -->
+                  <span class="absolute top-0 left-0 w-1.5 h-1.5 border-t border-l border-[#EF5A24]/30 group-hover:border-[#EF5A24] transition-colors"></span>
+                  <span class="absolute top-0 right-0 w-1.5 h-1.5 border-t border-r border-[#EF5A24]/30 group-hover:border-[#EF5A24] transition-colors"></span>
+                  <span class="absolute bottom-0 left-0 w-1.5 h-1.5 border-b border-l border-[#EF5A24]/30 group-hover:border-[#EF5A24] transition-colors"></span>
+                  <span class="absolute bottom-0 right-0 w-1.5 h-1.5 border-b border-r border-[#EF5A24]/30 group-hover:border-[#EF5A24] transition-colors"></span>
+
+                  <div class="flex items-center gap-3">
+                    <div 
+                      class="w-10 h-10 rounded-lg flex items-center justify-center border transition-all duration-300"
+                      :class="[
+                        bId === 'cluster-1' || bId === 'cluster-5' 
+                          ? 'border-[#EF5A24]/20 group-hover:border-[#EF5A24] text-[#EF5A24] bg-[#EF5A24]/5' 
+                          : 'border-[#06B6D4]/20 group-hover:border-[#06B6D4] text-[#06B6D4] bg-[#06B6D4]/5'
+                      ]"
+                    >
+                      <UIcon :name="tele.icon" class="w-5 h-5" />
+                    </div>
+                    <div>
+                      <div class="font-technical text-[10px] font-bold text-white/50 tracking-wider flex items-center gap-1.5">
+                        <span>{{ tele.code }}</span>
+                        <span class="w-1 h-1 rounded-full bg-green-500 animate-pulse"></span>
+                        <span class="text-[8px] font-normal uppercase">ACTIVE</span>
+                      </div>
+                      <div class="font-extrabold text-sm text-white mt-0.5 group-hover:text-[#EF5A24] transition-colors">{{ tele.label }}</div>
+                    </div>
                   </div>
-                  <span class="text-[#EF5A24]">→</span>
-                </button>
-                <button 
-                  @click="selectedBuilding = 'cluster-2'; selectedFloor = 1"
-                  class="flex items-center justify-between p-3 rounded-lg bg-[#0F1E36]/50 border border-white/5 hover:border-[#EF5A24]/40 hover:bg-[#EF5A24]/5 text-left text-xs transition-all duration-300"
-                >
-                  <div>
-                    <div class="font-bold text-white">Academic Cluster 2</div>
-                    <div class="text-[10px] text-white/50 mt-1">Electrical Engineering, IT, CS</div>
+                  
+                  <div class="text-right flex flex-col items-end">
+                    <span class="text-[10px] font-technical text-white/80 font-bold">LABS: {{ tele.labsCount }}</span>
+                    <span class="text-[9px] font-technical text-white/40 mt-0.5">UNITS: {{ tele.equipCount }}</span>
                   </div>
-                  <span class="text-[#EF5A24]">→</span>
-                </button>
-                <button 
-                  @click="selectedBuilding = 'cluster-3'; selectedFloor = 1"
-                  class="flex items-center justify-between p-3 rounded-lg bg-[#0F1E36]/50 border border-white/5 hover:border-[#EF5A24]/40 hover:bg-[#EF5A24]/5 text-left text-xs transition-all duration-300"
-                >
-                  <div>
-                    <div class="font-bold text-white">Academic Cluster 3</div>
-                    <div class="text-[10px] text-white/50 mt-1">Mechanical Eng., Mechatronics</div>
-                  </div>
-                  <span class="text-[#EF5A24]">→</span>
-                </button>
-                <button 
-                  @click="selectedBuilding = 'cluster-5'; selectedFloor = 1"
-                  class="flex items-center justify-between p-3 rounded-lg bg-[#0F1E36]/50 border border-white/5 hover:border-[#EF5A24]/40 hover:bg-[#EF5A24]/5 text-left text-xs transition-all duration-300"
-                >
-                  <div>
-                    <div class="font-bold text-white">Academic Cluster 5</div>
-                    <div class="text-[10px] text-white/50 mt-1">Chemical & Civil Engineering</div>
-                  </div>
-                  <span class="text-[#EF5A24]">→</span>
-                </button>
-                <button 
-                  @click="selectedBuilding = 'cluster-6'; selectedFloor = 1"
-                  class="flex items-center justify-between p-3 rounded-lg bg-[#0F1E36]/50 border border-white/5 hover:border-[#EF5A24]/40 hover:bg-[#EF5A24]/5 text-left text-xs transition-all duration-300"
-                >
-                  <div>
-                    <div class="font-bold text-white">Academic Cluster 6</div>
-                    <div class="text-[10px] text-white/50 mt-1">Business Administration, Finance</div>
-                  </div>
-                  <span class="text-[#EF5A24]">→</span>
                 </button>
               </div>
             </div>
@@ -188,8 +176,9 @@
               </div>
 
               <!-- MDC Content overview rendering -->
-              <div class="text-xs leading-relaxed text-white/80 border-b border-white/10 pb-4">
-                <ContentRenderer :value="selectedRoomDetail" />
+              <div class="text-xs leading-relaxed text-white/80 border-b border-white/10 pb-4 select-text">
+                <ContentRenderer v-if="selectedRoomDetail.body" :value="selectedRoomDetail" />
+                <p v-else>{{ selectedRoomDetail.description }}</p>
               </div>
 
               <!-- Highlighted Machinery Section -->
@@ -277,7 +266,7 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, watch } from 'vue'
 
 const activeView = ref('map')
 const selectedBuilding = ref(null)
@@ -293,17 +282,88 @@ const { data: equipment } = await useAsyncData('equipment', () => queryCollectio
 const labsList = computed(() => labs.value || [])
 const equipmentList = computed(() => equipment.value || [])
 
-// 2. Computed filtering operations
+// 2. Fetch the floorplan GeoJSON dynamically in the parent to support comprehensive room listing
+const currentFloorGeojson = ref(null)
+
+watch([selectedBuilding, selectedFloor], async ([newB, newF]) => {
+  if (!newB || !newF) {
+    currentFloorGeojson.value = null
+    return
+  }
+  try {
+    const res = await fetch(`/data/floorplans/msi-floor${newF}.json`)
+    currentFloorGeojson.value = await res.json()
+  } catch (err) {
+    console.error('Failed to fetch floorplan json', err)
+    currentFloorGeojson.value = null
+  }
+}, { immediate: true })
+
+const config = useRuntimeConfig()
+const displayOnlyRoomsWithMachines = computed(() => config.public.displayOnlyRoomsWithMachines)
+
+// 3. Computed filtering operations
 const filteredRooms = computed(() => {
   if (!selectedBuilding.value || !selectedFloor.value) return []
-  return labsList.value.filter(
+  
+  // Get all rooms from labs collection on this floor
+  const labRooms = labsList.value.filter(
     room => room.building_id === selectedBuilding.value && room.floor === selectedFloor.value
   )
+  
+  if (displayOnlyRoomsWithMachines.value) {
+    return labRooms.map(lr => ({
+      room_id: lr.room_id,
+      name: lr.name,
+      status: lr.status || 'active'
+    }))
+  }
+  
+  // Otherwise, get all rooms from floorplan JSON excluding structural items
+  if (!currentFloorGeojson.value) return []
+  
+  return currentFloorGeojson.value.features
+    .filter(f => 
+      f.properties.building_id === selectedBuilding.value &&
+      !['corridor', 'stairwell', 'elevator', 'service', 'lobby', 'terrace', 'courtyard'].includes(f.properties.type)
+    )
+    .map(f => {
+      const matchingLab = labRooms.find(lr => lr.room_id === f.properties.room_id)
+      return {
+        room_id: f.properties.room_id,
+        name: matchingLab ? matchingLab.name : f.properties.name,
+        status: matchingLab ? matchingLab.status : 'active'
+      }
+    })
 })
 
 const selectedRoomDetail = computed(() => {
   if (!selectedRoomId.value) return null
-  return labsList.value.find(room => room.room_id === selectedRoomId.value) || null
+  
+  // Find in labs collection first
+  const lab = labsList.value.find(room => room.room_id === selectedRoomId.value)
+  if (lab) return lab
+  
+  // Fallback to GeoJSON properties
+  if (!currentFloorGeojson.value) return null
+  const feature = currentFloorGeojson.value.features.find(f => f.properties.room_id === selectedRoomId.value)
+  if (!feature) return null
+  
+  return {
+    room_id: feature.properties.room_id,
+    name: feature.properties.name,
+    building_id: feature.properties.building_id,
+    floor: feature.properties.level,
+    departments: [feature.properties.department || 'General Academic'],
+    head_of_lab: {
+      name: "TBD",
+      email: "facilities@vgu.edu.vn",
+      office: "Facilities Office"
+    },
+    status: "active",
+    highlighted_equipment: [],
+    description: "This laboratory cell is designated for research and study. Full instrumentation and staffing inventories are pending the next phase of the digital twin projection."
+  }
 })
 
 const highlightedMachines = computed(() => {
@@ -320,6 +380,29 @@ const roomTourEquipment = computed(() => {
   return equipmentList.value.filter(
     mach => mach.location.room_id === selectedRoomTour.value.room_id
   )
+})
+
+// 4. Cluster dynamic stats telemetry
+const clusterTelemetry = computed(() => {
+  const data = {
+    'cluster-1': { label: 'Cluster 1', code: 'SEC-A1', icon: 'i-lucide-atom' },
+    'cluster-2': { label: 'Cluster 2', code: 'SEC-A2', icon: 'i-lucide-binary' },
+    'cluster-3': { label: 'Cluster 3', code: 'SEC-A3', icon: 'i-lucide-settings' },
+    'cluster-5': { label: 'Cluster 5', code: 'SEC-B5', icon: 'i-lucide-flask-conical' },
+    'cluster-6': { label: 'Cluster 6', code: 'SEC-B6', icon: 'i-lucide-trending-up' }
+  }
+  
+  const stats = {}
+  Object.keys(data).forEach(c => {
+    const cLabs = labsList.value.filter(l => l.building_id === c)
+    const cEquip = equipmentList.value.filter(e => e.location?.building_id === c)
+    stats[c] = {
+      ...data[c],
+      labsCount: cLabs.length,
+      equipCount: cEquip.length
+    }
+  })
+  return stats
 })
 
 // 3. Selection Handlers

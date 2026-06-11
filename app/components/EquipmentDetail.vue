@@ -110,6 +110,23 @@
               </div>
             </div>
 
+            <!-- Interactive Visualizer HUD Frame Overlay -->
+            <div class="absolute inset-0 pointer-events-none z-25 border border-[#06B6D4]/20">
+              <!-- Corner Crosshairs -->
+              <span class="absolute top-2 left-2 w-3 h-3 border-t-2 border-l-2 border-[#06B6D4]/40"></span>
+              <span class="absolute top-2 right-2 w-3 h-3 border-t-2 border-r-2 border-[#06B6D4]/40"></span>
+              <span class="absolute bottom-2 left-2 w-3 h-3 border-b-2 border-l-2 border-[#06B6D4]/40"></span>
+              <span class="absolute bottom-2 right-2 w-3 h-3 border-b-2 border-r-2 border-[#06B6D4]/40"></span>
+              
+              <!-- Telemetry reading overlay -->
+              <div class="absolute top-3 right-3 flex flex-col items-end gap-0.5 text-[8px] font-technical text-[#06B6D4]/70 bg-black/45 px-1.5 py-1 rounded border border-white/5 backdrop-blur-xs">
+                <div>SYS_LINK: ONLINE</div>
+                <div>X-RAY SCAN: ACTIVE</div>
+                <div>RESOL: 0.12 NM</div>
+                <div>WAVELENGTH: 532 NM</div>
+              </div>
+            </div>
+
             <!-- Interaction Overlay -->
             <div 
               ref="revealContainer"
