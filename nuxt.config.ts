@@ -1,7 +1,7 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
   compatibilityDate: '2025-07-15',
-  
+
   app: {
     head: {
       script: [
@@ -31,6 +31,13 @@ export default defineNuxtConfig({
     '@vite-pwa/nuxt'
   ],
 
+  runtimeConfig: {
+    public: {
+      // Set to true to filter map and sidebar to only show laboratory rooms that have machines
+      displayOnlyRoomsWithMachines: false
+    }
+  },
+
   devtools: { enabled: true },
 
   css: [
@@ -38,6 +45,9 @@ export default defineNuxtConfig({
   ],
 
   pwa: {
+    // 1. Inject manifest directly via Nitro route rules for edge deployments
+    registerWebManifestInRouteRules: true,
+
     registerType: 'autoUpdate',
     manifest: {
       name: 'VGU Interactive Labs',
@@ -62,6 +72,16 @@ export default defineNuxtConfig({
     },
     workbox: {
       globPatterns: ['**/*.{js,css,html,png,svg,avif,ico,json}'],
+      // 2. Explicitly hide Cloudflare's edge worker from Workbox
+      globIgnores: [
+        '**/_worker.js',
+        '**/_worker.js/**/*'
+      ],
+      // 3. Prevent the Service Worker from intercepting API or SSR requests
+      navigateFallbackDenylist: [
+        /^\/api\//,
+        /^\/_nitro\//
+      ],
       runtimeCaching: [
         {
           urlPattern: /^https:\/\/.*\.tile\.openstreetmap\.org\/.*/i,
@@ -75,6 +95,12 @@ export default defineNuxtConfig({
           }
         }
       ]
+    }
+  },
+  nitro: {
+    // 4. Align Nuxt's routing with Cloudflare's strict URL matching
+    prerender: {
+      autoSubfolderIndex: false,
     }
   }
 })
