@@ -1,5 +1,8 @@
 <template>
-  <div v-if="room" class="fixed inset-0 z-50 bg-[#070A12] text-white flex flex-col font-sans select-none scanline laser-scan">
+  <div v-if="room" class="fixed inset-0 z-50 bg-[#070A12] text-white flex flex-col font-sans select-none">
+    <!-- Visual Cyber Scan Overlays -->
+    <div class="absolute inset-0 pointer-events-none z-45 scanline laser-scan"></div>
+
     <!-- Fixed Cyber Header -->
     <header class="fixed top-0 left-0 right-0 h-16 border-b border-[#EF5A24]/20 bg-[#0F1E36]/90 backdrop-blur-md px-6 flex items-center justify-between z-50">
       <div class="flex items-center gap-3">
@@ -10,7 +13,7 @@
           @click="emit('close')"
           class="text-white/60 hover:text-white font-technical text-xs font-bold uppercase tracking-wider hover:bg-white/5"
         >
-          ← Back to Map
+          Back to Map
         </UButton>
       </div>
       <div class="flex items-center gap-4">
@@ -103,12 +106,12 @@
             </template>
             <div class="flex items-center gap-4 text-xs">
               <div class="w-10 h-10 rounded-lg bg-[#0C2B5C] border border-[#06B6D4]/30 flex items-center justify-center text-[#06B6D4] font-bold text-base">
-                {{ room.head_of_lab.name.split(' ').pop().charAt(0) }}
+                {{ room.head_of_lab?.name?.split(' ').pop().charAt(0) || '?' }}
               </div>
               <div>
-                <div class="font-bold text-white leading-tight">{{ room.head_of_lab.name }}</div>
-                <div class="text-white/50 text-[11px] mt-0.5">Coordinator // Office: {{ room.head_of_lab.office }}</div>
-                <div class="text-[#06B6D4] font-technical text-[10px] mt-0.5">{{ room.head_of_lab.email }}</div>
+                <div class="font-bold text-white leading-tight">{{ room.head_of_lab?.name }}</div>
+                <div class="text-white/50 text-[11px] mt-0.5">Coordinator // Office: {{ room.head_of_lab?.office }}</div>
+                <div class="text-[#06B6D4] font-technical text-[10px] mt-0.5">{{ room.head_of_lab?.email }}</div>
               </div>
             </div>
           </UCard>
@@ -135,7 +138,7 @@
           <div class="mt-auto pt-6 flex justify-center">
             <UButton 
               v-if="equipment.length"
-              @click="scrollToNext(0)"
+              @click="scrollToNext(1)"
               icon="i-lucide-arrow-down"
               color="primary"
               variant="outline"
@@ -151,7 +154,7 @@
       <section 
         v-for="(mach, idx) in equipment" 
         :key="mach.id"
-        class="h-screen w-full snap-start shrink-0 relative flex flex-col justify-center pt-16 bg-black overflow-hidden"
+        class="h-screen w-full snap-start shrink-0 relative flex flex-col justify-center items-center lg:items-start p-6 lg:p-16 pt-20 bg-black overflow-hidden"
       >
         <!-- Widescreen Background Equipment Image -->
         <div class="absolute inset-0 z-10 flex items-center justify-center bg-black">
@@ -166,42 +169,106 @@
           <div class="absolute inset-0 opacity-15 cyber-grid pointer-events-none"></div>
         </div>
 
-        <!-- Float Holographic Detail Card (Spacious HUD Look) -->
-        <div class="absolute left-6 md:left-16 top-1/2 -translate-y-1/2 z-30 max-w-xl w-[90%] md:w-auto">
-          <div class="vgu-panel p-6 border border-[#EF5A24]/30 shadow-2xl rounded-xl bg-[#0F1E36]/90 backdrop-blur-md flex flex-col gap-4">
+        <!-- Float Holographic Detail Card with dynamic tabs -->
+        <div class="z-30 max-w-xl w-full lg:w-auto mx-auto lg:mx-0 lg:ml-16 overflow-y-auto max-h-[85vh] shrink-0 my-auto">
+          <div class="vgu-panel p-5 border border-[#EF5A24]/30 shadow-2xl rounded-xl bg-[#0F1E36]/90 backdrop-blur-md flex flex-col gap-3.5 w-full">
             <div>
               <div class="text-[#EF5A24] text-[10px] font-technical uppercase font-bold tracking-widest leading-none">
                 INSTRUMENT PROFILE // {{ idx + 1 }} OF {{ equipment.length }}
               </div>
-              <h3 class="text-2xl font-extrabold text-white mt-2 leading-tight tracking-tight">{{ mach.title }}</h3>
-              <div class="text-[10px] font-technical text-[#06B6D4] uppercase font-bold tracking-wider mt-1.5">
+              <h3 class="text-xl md:text-2xl font-extrabold text-white mt-2 leading-tight tracking-tight">{{ mach.title }}</h3>
+              <div class="text-[10px] font-technical text-[#06B6D4] uppercase font-bold tracking-wider mt-1">
                 {{ mach.manufacturer }} // {{ mach.model }}
               </div>
             </div>
 
-            <!-- Mathematical Equation block -->
-            <div class="p-3 bg-black/60 rounded-lg border border-white/5 flex flex-col gap-1">
-              <span class="text-white/40 text-[9px] font-technical uppercase leading-none">PHYSICS EQUATION</span>
-              <code class="text-[#EF5A24] font-technical text-sm font-bold truncate mt-1">
-                {{ mach.physics?.equation }}
-              </code>
-              <span class="text-white/60 text-[10px] mt-0.5">Model: {{ mach.physics?.mathematical_model }}</span>
+            <!-- Custom Cyber Tab Switcher -->
+            <div class="flex flex-wrap gap-1.5 border-b border-white/10 pb-2">
+              <button
+                v-for="tab in getDynamicTabsForMachine(mach)"
+                :key="tab.key"
+                @click="setActiveTab(mach.id, tab.key)"
+                class="px-2.5 py-1 rounded-md text-[9px] font-technical uppercase font-bold tracking-wider transition-all duration-300 flex items-center gap-1.5 border cursor-pointer select-none"
+                :class="getActiveTab(mach.id) === tab.key 
+                  ? 'bg-[#EF5A24]/10 border-[#EF5A24] text-white shadow-[0_0_8px_rgba(239,90,36,0.25)]' 
+                  : 'bg-[#0F1E36]/40 border-white/5 text-white/50 hover:text-white hover:bg-[#0F1E36]/70 hover:border-white/10'"
+              >
+                <span 
+                  class="w-1 h-1 rounded-full"
+                  :class="getActiveTab(mach.id) === tab.key ? 'bg-[#EF5A24] shadow-[0_0_4px_#EF5A24]' : 'bg-white/20'"
+                ></span>
+                <UIcon :name="tab.icon" class="w-3 h-3" />
+                <span>{{ tab.label }}</span>
+              </button>
             </div>
 
-            <!-- Truncated Description Story -->
-            <div class="text-xs text-white/70 leading-relaxed pr-2">
-              <!-- Using CSS line-clamp to truncate if content is very long, ending with technical dots -->
-              <p class="line-clamp-4 select-text">
-                {{ getStoryText(mach) }}
-              </p>
-            </div>
+            <!-- Tab Content Area (Scrollable height-constrained) -->
+            <div class="flex-grow flex flex-col justify-start min-h-[140px] max-h-[220px] overflow-y-auto pr-1">
+              <Transition name="fade" mode="out-in">
+                <div :key="getActiveTab(mach.id)">
+                  <!-- 1. Overview Tab -->
+                  <div v-if="getActiveTab(mach.id) === 'overview'" class="text-xs text-white/80 leading-relaxed prose prose-invert select-text">
+                    <ContentRenderer :value="mach" />
+                  </div>
 
-            <!-- Specifications Grid -->
-            <div class="grid grid-cols-2 gap-x-4 gap-y-2 border-t border-white/5 pt-3.5 text-[11px]">
-              <template v-for="(val, key) in Object.entries(mach.specifications).slice(0, 3)" :key="key">
-                <span class="text-white/40 font-technical uppercase truncate py-0.5 border-b border-white/5">{{ val[0].replace('_', ' ') }}</span>
-                <span class="text-white font-semibold text-right truncate py-0.5 border-b border-white/5">{{ val[1] }}</span>
-              </template>
+                  <!-- 2. Dynamic Frontmatter Tabs -->
+                  <div v-else-if="mach[getActiveTab(mach.id)]" class="text-xs text-white/80 select-text">
+                    <!-- Case A: Links -->
+                    <div v-if="getActiveTab(mach.id) === 'links' || (Array.isArray(mach[getActiveTab(mach.id)]) && mach[getActiveTab(mach.id)].length && typeof mach[getActiveTab(mach.id)][0] === 'object' && mach[getActiveTab(mach.id)][0].url)" class="flex flex-col gap-2">
+                      <a 
+                        v-for="link in mach[getActiveTab(mach.id)]" 
+                        :key="link.url"
+                        :href="link.url"
+                        target="_blank"
+                        rel="noopener"
+                        class="flex items-center justify-between p-2.5 rounded-lg bg-black/40 border border-white/5 hover:border-[#EF5A24]/40 hover:bg-[#EF5A24]/5 text-xs text-white/80 hover:text-white transition-all duration-300 pointer-events-auto"
+                      >
+                        <span class="truncate font-sans font-medium">{{ link.title }}</span>
+                        <span class="text-[#EF5A24] font-technical font-bold text-[9px] shrink-0">LAUNCH →</span>
+                      </a>
+                    </div>
+
+                    <!-- Case B: Physics -->
+                    <div v-else-if="getActiveTab(mach.id) === 'physics'" class="flex flex-col gap-3">
+                      <div class="bg-black/50 p-2.5 rounded-lg border border-white/5 flex flex-col gap-1.5">
+                        <div class="flex flex-col">
+                          <span class="text-white/40 text-[8px] font-technical uppercase leading-none">PRIMARY MECHANISM</span>
+                          <span class="text-white font-medium text-xs mt-1">{{ mach.physics?.primary_mechanism }}</span>
+                        </div>
+                        <span class="text-white/50 text-[9px] mt-0.5">Model: {{ mach.physics?.mathematical_model }}</span>
+                        <div v-if="mach.physics?.equation" class="mt-2 text-center p-2.5 bg-black/70 rounded border border-white/5">
+                          <code class="text-[#EF5A24] font-technical text-sm font-bold">{{ mach.physics?.equation }}</code>
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Case C: Flat Record / Specifications -->
+                    <div v-else-if="typeof mach[getActiveTab(mach.id)] === 'object' && !Array.isArray(mach[getActiveTab(mach.id)])" class="grid grid-cols-2 gap-x-4 gap-y-2 border-t border-white/5 pt-1.5 text-[10px]">
+                      <template v-for="(val, key) in Object.entries(mach[getActiveTab(mach.id)])" :key="key">
+                        <span class="text-white/40 font-technical uppercase truncate py-0.5 border-b border-white/5">{{ key.replace(/_/g, ' ') }}</span>
+                        <span class="text-white font-semibold text-right truncate py-0.5 border-b border-white/5">{{ val }}</span>
+                      </template>
+                    </div>
+
+                    <!-- Case D: Array of Strings -->
+                    <div v-else-if="Array.isArray(mach[getActiveTab(mach.id)]) && typeof mach[getActiveTab(mach.id)][0] === 'string'" class="flex flex-col gap-2">
+                      <div 
+                        v-for="(step, sIdx) in mach[getActiveTab(mach.id)]" 
+                        :key="sIdx"
+                        class="flex items-start gap-2 py-1.5 border-b border-white/5 last:border-b-0 text-[11px] leading-relaxed"
+                      >
+                        <span class="text-[#EF5A24] font-technical font-bold">[{{ sIdx + 1 }}]</span>
+                        <span>{{ step }}</span>
+                      </div>
+                    </div>
+
+                    <!-- Case E: Fallback -->
+                    <div v-else class="leading-relaxed bg-black/20 p-3.5 rounded border border-white/5 select-text">
+                      {{ mach[getActiveTab(mach.id)] }}
+                    </div>
+                  </div>
+                </div>
+              </Transition>
             </div>
 
             <!-- Bottom controls inside the HUD panel -->
@@ -216,7 +283,7 @@
                 color="primary"
                 variant="solid"
                 size="sm"
-                class="font-technical text-[10px] uppercase font-bold tracking-wider px-3.5 bg-[#EF5A24] hover:bg-[#EF5A24]/90 text-white"
+                class="font-technical text-[10px] uppercase font-bold tracking-wider px-3.5 bg-[#EF5A24] hover:bg-[#EF5A24]/90 text-white cursor-pointer select-none"
               >
                 OPEN PROFILE CODES →
               </UButton>
@@ -228,7 +295,7 @@
         <div class="absolute bottom-8 right-8 z-30 flex items-center gap-3">
           <UButton 
             v-if="idx < equipment.length - 1"
-            @click="scrollToNext(idx + 1)"
+            @click="scrollToNext(idx + 2)"
             icon="i-lucide-arrow-down"
             color="neutral"
             variant="ghost"
@@ -275,6 +342,64 @@ const activeImageIndex = ref(0)
 const isHovering = ref(false)
 const mouseX = ref(50)
 const mouseY = ref(50)
+
+// Keep track of active tabs for each equipment machine locally
+const activeTabsMap = ref({})
+
+function getActiveTab(machId) {
+  if (!activeTabsMap.value[machId]) {
+    activeTabsMap.value[machId] = 'overview'
+  }
+  return activeTabsMap.value[machId]
+}
+
+function setActiveTab(machId, tabKey) {
+  activeTabsMap.value[machId] = tabKey
+}
+
+const systemKeys = [
+  'id', 'title', 'model', 'manufacturer', 'departments', 
+  'location', 'media', 'status', 'body', 'meta', 'excerpt', 
+  'type', 'source', 'stem', 'extension', '_id', '_path', 
+  '_dir', '_draft', '_type', '_locale'
+]
+
+// Generate dynamic tabs list per machine
+function getDynamicTabsForMachine(mach) {
+  const tabs = [
+    { key: 'overview', label: 'Overview', icon: 'i-lucide-book-open' }
+  ]
+  if (!mach) return tabs
+  
+  const itemKeys = Object.keys(mach).filter(key => {
+    return !systemKeys.includes(key) && !key.startsWith('_')
+  })
+  
+  const iconMap = {
+    physics: 'i-lucide-atom',
+    specifications: 'i-lucide-settings',
+    links: 'i-lucide-link',
+    safety: 'i-lucide-shield-alert',
+    procedures: 'i-lucide-list-todo',
+    maintenance: 'i-lucide-wrench',
+    calibration: 'i-lucide-gauge'
+  }
+  
+  itemKeys.forEach(key => {
+    const label = key
+      .split('_')
+      .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(' ')
+      
+    tabs.push({
+      key,
+      label,
+      icon: iconMap[key.toLowerCase()] || 'i-lucide-info'
+    })
+  })
+  
+  return tabs
+}
 
 // Lab Images selection based on room department
 const labImages = computed(() => {
@@ -337,26 +462,16 @@ function handleMouseMove(e) {
 function handleMouseLeave() {
   isHovering.value = false
 }
-
-// Get equipment story narrative from either standard md body or custom field
-function getStoryText(mach) {
-  if (!mach) return ''
-  // Try retrieving markdown content or default story text
-  if (mach.description) return mach.description
-  
-  // Custom fallback strings to test long text truncation dots
-  const baseStory = "This advanced system is certified for material sintering and thermal ramp studies. It features full automated flow controls and thermal shielding."
-  const longStory = "It features full automated flow controls and thermal shielding, supporting high pressure vacuum measurements and structural alloy deposition steps. Designed as a primary research node, it delivers clean crystallization data under inert atmospheres. Rigorous protective casings prevent thermal bleeding into ambient lab environments."
-  return `${baseStory} ${longStory} ${baseStory}`
-}
 </script>
 
 <style scoped>
-/* Snap scroll layout defaults */
-.snap-y {
-  scroll-snap-type: y mandatory;
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.15s ease;
 }
-.snap-start {
-  scroll-snap-align: start;
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
 }
 </style>

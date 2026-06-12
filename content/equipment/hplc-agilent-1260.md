@@ -12,12 +12,12 @@ location:
   station_id: "station-ch-1"
 media:
   images:
-    - "/images/equipment/xrd-exterior.png"
+    - "/images/equipment/hplc-exterior.png"
   ambient_color: "#EC4899"
 physics:
   primary_mechanism: "High Pressure Liquid Phase Separation"
   mathematical_model: "Van Deemter Equation"
-  equation: "H = A + \frac{B}{u} + C \cdot u"
+  equation: "H = A + \\frac{B}{u} + C \\cdot u"
   target_materials:
     - "Organic solvent mixtures"
     - "Polymer solutions"

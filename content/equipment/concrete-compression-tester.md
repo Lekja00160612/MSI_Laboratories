@@ -12,12 +12,12 @@ location:
   station_id: "station-civ-1"
 media:
   images:
-    - "/images/equipment/xrd-exterior.png"
+    - "/images/equipment/concrete-exterior.png"
   ambient_color: "#6B7280"
 physics:
   primary_mechanism: "Hydraulic Load Application"
   mathematical_model: "Compressive Stress"
-  equation: "\sigma = \frac{F}{A}"
+  equation: "\\sigma = \\frac{F}{A}"
   target_materials:
     - "Concrete cylinders"
     - "Brick blocks"

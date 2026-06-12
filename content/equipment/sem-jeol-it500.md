@@ -7,9 +7,9 @@ departments:
   - "Materials Science and Engineering"
   - "Electrical Engineering"
 location:
-  building_id: "cluster-5"
-  floor: 2
-  room_id: "b5-203"
+  building_id: "cluster-1"
+  floor: 1
+  room_id: "b1-103"
   station_id: "station-sem-1"
 media:
   images:

@@ -12,12 +12,12 @@ location:
   station_id: "station-opt-1"
 media:
   images:
-    - "/images/equipment/furnace-exterior.png"
+    - "/images/equipment/laser-exterior.png"
   ambient_color: "#8B5CF6"
 physics:
   primary_mechanism: "Optoelectronic Spectroscopy"
   mathematical_model: "Planck-Einstein Relation"
-  equation: "E = h\nu"
+  equation: "E = h\\nu"
   target_materials:
     - "Semiconductor thin films"
     - "Laser dye solutions"

@@ -1,4 +1,6 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
+import { execSync } from 'child_process'
+
 export default defineNuxtConfig({
   compatibilityDate: '2025-07-15',
 
@@ -34,11 +36,24 @@ export default defineNuxtConfig({
   runtimeConfig: {
     public: {
       // Set to true to filter map and sidebar to only show laboratory rooms that have machines
-      displayOnlyRoomsWithMachines: false
+      displayOnlyRoomsWithMachines: true,
+      mapZoomedInThreshold: 17.4,
+      defaultZoomLevel: 17.5
     }
   },
 
   devtools: { enabled: true },
+
+  hooks: {
+    'build:before'() {
+      console.log('Nuxt Hook: Regenerating floorplan GeoJSON files from CAD CSV sources...')
+      try {
+        execSync('node scripts/parse-floorplans.js', { stdio: 'inherit' })
+      } catch (err) {
+        console.error('Failed to run floorplans parser script', err)
+      }
+    }
+  },
 
   css: [
     '~/assets/css/main.css'

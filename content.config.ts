@@ -45,14 +45,14 @@ export default defineContentConfig({
           mathematical_model: z.string(),
           equation: z.string(),
           target_materials: z.array(z.string())
-        }),
-        specifications: z.record(z.string()),
+        }).optional(),
+        specifications: z.record(z.string()).optional(),
         links: z.array(z.object({
           title: z.string(),
           url: z.string()
-        })),
+        })).optional(),
         status: z.string().default('operational')
-      })
+      }).catchall(z.any())
     })
   }
 })

@@ -12,12 +12,12 @@ location:
   station_id: "station-ee-1"
 media:
   images:
-    - "/images/equipment/sem-exterior.png"
+    - "/images/equipment/arduino-exterior.png"
   ambient_color: "#3B82F6"
 physics:
   primary_mechanism: "Digital Circuit Prototyping"
   mathematical_model: "Ohm's Law"
-  equation: "V = I \cdot R"
+  equation: "V = I \\cdot R"
   target_materials:
     - "Microcontrollers"
     - "Sensors and Actuators"

@@ -12,7 +12,7 @@ location:
   station_id: "station-fin-1"
 media:
   images:
-    - "/images/equipment/sem-exterior.png"
+    - "/images/equipment/bloomberg-exterior.png"
   ambient_color: "#F59E0B"
 physics:
   primary_mechanism: "Real-time Financial Analytics Feed"

@@ -12,12 +12,12 @@ location:
   station_id: "station-net-1"
 media:
   images:
-    - "/images/equipment/sem-exterior.png"
+    - "/images/equipment/router-exterior.png"
   ambient_color: "#10B981"
 physics:
   primary_mechanism: "High-Speed Packet Routing"
   mathematical_model: "Shannon Entropy Channel Capacity"
-  equation: "C = B \log_2(1 + S/N)"
+  equation: "C = B \\log_2(1 + S/N)"
   target_materials:
     - "Ethernet packets"
     - "Fiber optic signals"

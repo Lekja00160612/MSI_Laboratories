@@ -12,12 +12,12 @@ location:
   station_id: "station-cnc-1"
 media:
   images:
-    - "/images/equipment/furnace-exterior.png"
+    - "/images/equipment/cnc-exterior.png"
   ambient_color: "#34D399"
 physics:
   primary_mechanism: "Rotary Chip Removal Cutting"
   mathematical_model: "Cutting Speed Relation"
-  equation: "V_c = \frac{\pi \cdot d \cdot n}{1000}"
+  equation: "V_c = \\frac{\\pi \\cdot d \\cdot n}{1000}"
   target_materials:
     - "Aluminium 6061"
     - "Medium Carbon Steel"

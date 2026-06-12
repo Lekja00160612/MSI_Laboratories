@@ -5,7 +5,7 @@
       ref="mapContainer" 
       :class="[
         'w-full h-full rounded-lg overflow-hidden border border-[#EF5A24]/10 shadow-2xl transition-all duration-300',
-        { 'map-zoomed-in': zoomLevel <= 18 }
+        { 'map-zoomed-in': zoomLevel <= mapZoomedInThreshold }
       ]"
     ></div>
 
@@ -33,8 +33,8 @@
       </div>
     </div>
 
-    <!-- Right Hand Elevator UI (Floors) -->
-    <div v-if="selectedBuilding" class="absolute right-6 top-1/2 -translate-y-1/2 z-20 flex flex-col gap-2 bg-[#0F1E36]/90 backdrop-blur-md border border-[#EF5A24]/30 p-2 rounded-full shadow-lg">
+    <!-- Left Hand Elevator UI (Floors) -->
+    <div v-if="selectedBuilding" class="absolute left-6 top-1/2 -translate-y-1/2 z-20 flex flex-col gap-2 bg-[#0F1E36]/90 backdrop-blur-md border border-[#EF5A24]/30 p-2 rounded-full shadow-lg">
       <button 
         v-for="floorNum in floors" 
         :key="floorNum" 
@@ -43,7 +43,9 @@
           'w-10 h-10 rounded-full flex items-center justify-center text-xs font-technical font-bold border transition-all duration-300',
           selectedFloor === floorNum 
             ? 'bg-[#EF5A24] border-[#EF5A24] text-white shadow-[0_0_10px_#EF5A24]' 
-            : 'border-white/10 hover:border-[#EF5A24]/60 text-white/70 hover:text-white'
+            : floorsWithLabs.has(floorNum)
+              ? 'border-[#06B6D4]/60 bg-[#06B6D4]/10 text-[#06B6D4] shadow-[0_0_8px_rgba(6,182,212,0.2)] hover:border-[#06B6D4] hover:text-white'
+              : 'border-white/10 hover:border-[#EF5A24]/60 text-white/70 hover:text-white'
         ]"
       >
         L{{ floorNum }}
@@ -106,7 +108,12 @@ const mapContainer = ref(null)
 let map = null
 const mapLoaded = ref(false)
 
-const zoomLevel = ref(16.5)
+const config = useRuntimeConfig()
+const displayOnlyRoomsWithMachines = computed(() => config.public.displayOnlyRoomsWithMachines)
+const mapZoomedInThreshold = computed(() => config.public.mapZoomedInThreshold ?? 17.5)
+const defaultZoomLevel = computed(() => config.public.defaultZoomLevel ?? 17.5)
+
+const zoomLevel = ref(defaultZoomLevel.value)
 const pitchLevel = ref(45)
 const mapCenter = ref([106.6155, 11.1083])
 const floorsConfig = ref({})
@@ -115,10 +122,32 @@ const floors = computed(() => {
   return floorsConfig.value[props.selectedBuilding] || [2, 1]
 })
 
-const config = useRuntimeConfig()
-const displayOnlyRoomsWithMachines = computed(() => config.public.displayOnlyRoomsWithMachines)
+const floorsWithLabs = computed(() => {
+  if (!props.selectedBuilding || !labs.value) return new Set()
+  const matching = labs.value.filter(l => l.building_id === props.selectedBuilding)
+  return new Set(matching.map(l => l.floor))
+})
 
 const { data: labs } = await useAsyncData('map-labs', () => queryCollection('labs').all())
+
+function getRoomsFilter(buildingId = null) {
+  const roomTypeFilter = ['==', ['get', 'type'], 'laboratory']
+  let filters = [roomTypeFilter]
+  if (buildingId) {
+    filters.push(['==', ['get', 'building_id'], buildingId])
+  }
+  
+  if (displayOnlyRoomsWithMachines.value) {
+    const labRoomIds = (labs.value || []).map(l => l.room_id)
+    if (labRoomIds.length > 0) {
+      filters.push(['match', ['get', 'room_id'], ...labRoomIds.flatMap(id => [id, true]), false])
+    } else {
+      filters.push(['==', ['get', 'room_id'], ''])
+    }
+  }
+  
+  return filters.length > 1 ? ['all', ...filters] : roomTypeFilter
+}
 
 // Initialize Map
 onMounted(async () => {
@@ -159,7 +188,7 @@ onMounted(async () => {
       ]
     },
     center: [106.6155, 11.1083],
-    zoom: 16.5,
+    zoom: defaultZoomLevel.value,
     pitch: 45,
     bearing: -20
   })
@@ -274,6 +303,7 @@ onMounted(async () => {
         ],
         'fill-opacity': 0.4
       },
+      filter: getRoomsFilter(),
       layout: {
         visibility: 'none'
       }
@@ -289,6 +319,7 @@ onMounted(async () => {
         'line-width': 2,
         'line-opacity': 0.8
       },
+      filter: getRoomsFilter(),
       layout: {
         visibility: 'none'
       }
@@ -329,8 +360,8 @@ onMounted(async () => {
       map.setFilter('vgu-selected-building-extrusion', ['==', ['get', 'building_id'], props.selectedBuilding])
       map.setFilter('vgu-selected-building-outline', ['==', ['get', 'building_id'], props.selectedBuilding])
       
-      map.setFilter('vgu-rooms-fill', ['==', ['get', 'building_id'], props.selectedBuilding])
-      map.setFilter('vgu-rooms-outline', ['==', ['get', 'building_id'], props.selectedBuilding])
+      map.setFilter('vgu-rooms-fill', getRoomsFilter(props.selectedBuilding))
+      map.setFilter('vgu-rooms-outline', getRoomsFilter(props.selectedBuilding))
       
       if (props.selectedFloor) {
         loadFloorplan(props.selectedFloor)
@@ -450,17 +481,12 @@ async function loadFloorplan(floorNum) {
 
     // Add HTML markers for rooms inside the selected building
     if (props.selectedBuilding) {
-      let bRooms = data.features.filter(f => f.properties.building_id === props.selectedBuilding)
+      let bRooms = data.features.filter(f => f.properties.building_id === props.selectedBuilding && f.properties.type === 'laboratory')
       
       // Filter rooms depending on displayOnlyRoomsWithMachines option
       if (displayOnlyRoomsWithMachines.value) {
         const labRoomIds = new Set((labs.value || []).map(l => l.room_id))
         bRooms = bRooms.filter(room => labRoomIds.has(room.properties.room_id))
-      } else {
-        // Exclude corridors, service nodes from overlay markers to keep map clean
-        bRooms = bRooms.filter(room => 
-          !['corridor', 'stairwell', 'elevator', 'service', 'lobby', 'terrace', 'courtyard'].includes(room.properties.type)
-        )
       }
 
       bRooms.forEach(room => {
@@ -535,8 +561,8 @@ watch([() => props.selectedBuilding, () => props.selectedFloor], async ([newBuil
       map.setFilter('vgu-selected-building-outline', ['==', ['get', 'building_id'], newBuilding])
       
       // Set filters for room layers
-      map.setFilter('vgu-rooms-fill', ['==', ['get', 'building_id'], newBuilding])
-      map.setFilter('vgu-rooms-outline', ['==', ['get', 'building_id'], newBuilding])
+      map.setFilter('vgu-rooms-fill', getRoomsFilter(newBuilding))
+      map.setFilter('vgu-rooms-outline', getRoomsFilter(newBuilding))
     }
 
     if (newFloor) {
@@ -551,7 +577,7 @@ watch([() => props.selectedBuilding, () => props.selectedFloor], async ([newBuil
       // Zoom out to campus view
       map.flyTo({
         center: [106.6155, 11.1083],
-        zoom: 16.5,
+        zoom: defaultZoomLevel.value,
         pitch: 45,
         bearing: -20,
         duration: 1500
@@ -564,8 +590,8 @@ watch([() => props.selectedBuilding, () => props.selectedFloor], async ([newBuil
       map.setFilter('vgu-selected-building-outline', ['==', ['get', 'building_id'], ''])
       
       // Hide floorplan layers and reset filters
-      map.setFilter('vgu-rooms-fill', null)
-      map.setFilter('vgu-rooms-outline', null)
+      map.setFilter('vgu-rooms-fill', getRoomsFilter())
+      map.setFilter('vgu-rooms-outline', getRoomsFilter())
       map.setLayoutProperty('vgu-rooms-fill', 'visibility', 'none')
       map.setLayoutProperty('vgu-rooms-outline', 'visibility', 'none')
 

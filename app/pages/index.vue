@@ -325,7 +325,7 @@ const filteredRooms = computed(() => {
   return currentFloorGeojson.value.features
     .filter(f => 
       f.properties.building_id === selectedBuilding.value &&
-      !['corridor', 'stairwell', 'elevator', 'service', 'lobby', 'terrace', 'courtyard'].includes(f.properties.type)
+      f.properties.type === 'laboratory'
     )
     .map(f => {
       const matchingLab = labRooms.find(lr => lr.room_id === f.properties.room_id)
