@@ -124,10 +124,61 @@ export default defineNuxtConfig({
               maxAgeSeconds: 60 * 60 * 24 * 30 // 30 Days
             }
           }
+        },
+        {
+          urlPattern: /^https:\/\/fonts\.(?:googleapis|gstatic)\.com\/.*/i,
+          handler: 'CacheFirst',
+          options: {
+            cacheName: 'google-fonts-cache',
+            expiration: {
+              maxEntries: 30,
+              maxAgeSeconds: 60 * 60 * 24 * 365 // 1 Year
+            }
+          }
+        },
+        {
+          urlPattern: /^https:\/\/ajax\.googleapis\.com\/ajax\/libs\/model-viewer\/.*/i,
+          handler: 'CacheFirst',
+          options: {
+            cacheName: 'model-viewer-assets-cache',
+            expiration: {
+              maxEntries: 10,
+              maxAgeSeconds: 60 * 60 * 24 * 30 // 30 Days
+            }
+          }
+        },
+        {
+          urlPattern: /^\/data\/floorplans\/.*\.json$/i,
+          handler: 'NetworkFirst',
+          options: {
+            cacheName: 'floorplans-data-cache',
+            expiration: {
+              maxEntries: 20,
+              maxAgeSeconds: 60 * 60 * 24 * 7 // 7 Days
+            }
+          }
+        },
+        {
+          urlPattern: /^\/images\/.*\.(?:png|jpg|jpeg|svg|avif|webp|gif)$/i,
+          handler: 'CacheFirst',
+          options: {
+            cacheName: 'local-images-cache',
+            expiration: {
+              maxEntries: 80,
+              maxAgeSeconds: 60 * 60 * 24 * 30 // 30 Days
+            }
+          }
         }
       ]
     }
   },
+
+  image: {
+    // In production (Cloudflare), use the native cloudflare provider to delegate optimization to Cloudflare edge;
+    // in development (local), fall back to the default ipx (sharp).
+    provider: process.env.NODE_ENV === 'production' ? 'cloudflare' : 'ipx'
+  },
+
   nitro: {
     // 4. Align Nuxt's routing with Cloudflare's strict URL matching
     prerender: {

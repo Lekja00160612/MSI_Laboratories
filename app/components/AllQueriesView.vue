@@ -96,16 +96,31 @@
               />
             </template>
             <template #content>
-              <div class="flex flex-col gap-2.5 pl-1 max-h-48 overflow-y-auto pr-1 py-2">
-                <UCheckbox
-                  v-for="dept in departments"
-                  :key="dept"
-                  :label="dept"
-                  :model-value="selectedDepartments.includes(dept)"
-                  @update:model-value="(checked) => toggleDepartment(dept, checked)"
-                  class="text-xs text-white/80"
-                  color="primary"
+              <div class="flex flex-col gap-2.5 pl-1 py-2">
+                <UInput 
+                  v-model="deptSearchQuery" 
+                  placeholder="Search department..." 
+                  size="xs"
+                  color="neutral"
+                  variant="outline"
+                  icon="i-lucide-search"
+                  :ui="{ base: 'ps-7', leading: 'pointer-events-none absolute inset-y-0 start-0 flex items-center justify-center ps-2', leadingIcon: 'w-3.5 h-3.5 text-white/40' }"
+                  class="mb-2 w-full"
                 />
+                <div v-if="filteredDeptOptions.length" class="flex flex-col gap-2.5 max-h-48 overflow-y-auto pr-1">
+                  <UCheckbox
+                    v-for="dept in filteredDeptOptions"
+                    :key="dept"
+                    :label="dept"
+                    :model-value="selectedDepartments.includes(dept)"
+                    @update:model-value="(checked) => toggleDepartment(dept, checked)"
+                    class="text-xs text-white/80"
+                    color="primary"
+                  />
+                </div>
+                <div v-else class="text-[10px] font-technical text-white/40 italic py-2 pl-1">
+                  NO DEPARTMENTS FOUND
+                </div>
               </div>
             </template>
           </UCollapsible>
@@ -124,16 +139,31 @@
               />
             </template>
             <template #content>
-              <div class="flex flex-col gap-2.5 pl-1 max-h-48 overflow-y-auto pr-1 py-2">
-                <UCheckbox
-                  v-for="cat in categories"
-                  :key="cat"
-                  :label="cat"
-                  :model-value="selectedCategories.includes(cat)"
-                  @update:model-value="(checked) => toggleCategory(cat, checked)"
-                  class="text-xs text-white/80"
-                  color="primary"
+              <div class="flex flex-col gap-2.5 pl-1 py-2">
+                <UInput 
+                  v-model="catSearchQuery" 
+                  placeholder="Search category..." 
+                  size="xs"
+                  color="neutral"
+                  variant="outline"
+                  icon="i-lucide-search"
+                  :ui="{ base: 'ps-7', leading: 'pointer-events-none absolute inset-y-0 start-0 flex items-center justify-center ps-2', leadingIcon: 'w-3.5 h-3.5 text-white/40' }"
+                  class="mb-2 w-full"
                 />
+                <div v-if="filteredCatOptions.length" class="flex flex-col gap-2.5 max-h-48 overflow-y-auto pr-1">
+                  <UCheckbox
+                    v-for="cat in filteredCatOptions"
+                    :key="cat"
+                    :label="cat"
+                    :model-value="selectedCategories.includes(cat)"
+                    @update:model-value="(checked) => toggleCategory(cat, checked)"
+                    class="text-xs text-white/80"
+                    color="primary"
+                  />
+                </div>
+                <div v-else class="text-[10px] font-technical text-white/40 italic py-2 pl-1">
+                  NO CATEGORIES FOUND
+                </div>
               </div>
             </template>
           </UCollapsible>
@@ -163,7 +193,7 @@
                   :ui="{ base: 'ps-7', leading: 'pointer-events-none absolute inset-y-0 start-0 flex items-center justify-center ps-2', leadingIcon: 'w-3.5 h-3.5 text-white/40' }"
                   class="mb-2 w-full"
                 />
-                <div class="flex flex-col gap-2.5 max-h-48 overflow-y-auto pr-1">
+                <div v-if="filteredRoomOptions.length" class="flex flex-col gap-2.5 max-h-48 overflow-y-auto pr-1">
                   <UCheckbox
                     v-for="room in filteredRoomOptions"
                     :key="room.value"
@@ -173,6 +203,9 @@
                     class="text-xs text-white/80"
                     color="primary"
                   />
+                </div>
+                <div v-else class="text-[10px] font-technical text-white/40 italic py-2 pl-1">
+                  NO ROOMS FOUND
                 </div>
               </div>
             </template>
@@ -196,28 +229,35 @@
             <div 
               v-for="item in paginatedEquipment" 
               :key="item.id"
-              class="vgu-panel rounded-xl overflow-hidden hover:vgu-panel-active border border-white/5 hover:border-[#EF5A24]/40 flex flex-col h-[380px] group transition-all duration-300"
+              class="vgu-panel rounded-xl overflow-hidden hover:vgu-panel-active border border-white/5 hover:border-[#EF5A24]/40 hover:shadow-[0_0_20px_rgba(239,90,36,0.15)] flex flex-col h-[380px] group transition-all duration-300"
             >
               <!-- Card Hero Image -->
-              <div class="relative w-full h-40 overflow-hidden bg-slate-950">
+              <NuxtLink :to="'/equipment/' + getCleanId(item)" class="relative block w-full h-40 overflow-hidden bg-slate-950 group/image">
                 <NuxtImg 
                   v-if="item.media?.images?.length" 
-                  :src="item.media.images[0]" 
+                  :src="getFirstImage(item)" 
                   format="avif"
                   class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" 
                   :alt="item.title"
                 />
                 <div v-else class="w-full h-full flex items-center justify-center text-white/20 text-xs font-technical">IMAGE NOT FOUND</div>
-                <div class="absolute top-3 right-3 bg-[#0C2B5C] border border-[#06B6D4]/30 px-2 py-0.5 rounded text-[9px] font-technical text-[#06B6D4]">
+                
+                <!-- Dynamic scanline bar that sweeps on hover -->
+                <div class="absolute inset-x-0 top-0 h-10 bg-gradient-to-b from-[#06B6D4]/15 to-transparent -translate-y-full group-hover/image:translate-y-[160px] transition-transform duration-[1200ms] ease-in-out pointer-events-none z-20"></div>
+                <div class="absolute top-0 left-0 right-0 h-[1.5px] bg-[#06B6D4]/60 shadow-[0_0_8px_#06B6D4] -translate-y-full group-hover/image:translate-y-[160px] transition-transform duration-[1200ms] ease-in-out pointer-events-none z-20"></div>
+
+                <div class="absolute top-3 right-3 bg-[#0C2B5C] border border-[#06B6D4]/30 px-2 py-0.5 rounded text-[9px] font-technical text-[#06B6D4] z-25">
                   {{ item.category || 'Instrument' }}
                 </div>
-              </div>
+              </NuxtLink>
 
               <!-- Card Content -->
               <div class="p-5 flex flex-col justify-between flex-grow">
                 <div>
                   <div class="text-[10px] font-technical text-[#EF5A24] font-bold">{{ item.manufacturer }} // {{ item.model }}</div>
-                  <h3 class="text-base font-bold text-white mt-1 group-hover:text-[#EF5A24] transition-colors line-clamp-1">{{ item.title }}</h3>
+                  <NuxtLink :to="'/equipment/' + getCleanId(item)" class="block">
+                    <h3 class="text-base font-bold text-white mt-1 group-hover:text-[#EF5A24] transition-colors line-clamp-1">{{ item.title }}</h3>
+                  </NuxtLink>
                   
                   <div class="text-xs text-white/50 line-clamp-2 mt-2 leading-relaxed">
                     {{ item.physics?.primary_mechanism }}
@@ -245,12 +285,13 @@
                     <span class="text-[9px] font-technical text-white/50 uppercase">{{ item.status }}</span>
                   </span>
                   
-                  <button 
-                    @click="emit('select-item', item)" 
-                    class="text-xs font-technical text-[#EF5A24] hover:underline animate-pulse"
+                  <NuxtLink 
+                    :to="'/equipment/' + getCleanId(item)" 
+                    class="text-xs font-technical text-[#EF5A24] hover:underline flex items-center gap-1 group/btn transition-all duration-300"
                   >
-                    PROFILE CODE_ACCESS →
-                  </button>
+                    <span>PROFILE CODE_ACCESS</span>
+                    <span class="transform group-hover/btn:translate-x-1 transition-transform duration-300">→</span>
+                  </NuxtLink>
                 </div>
               </div>
             </div>
@@ -278,6 +319,7 @@
 
 <script setup>
 import { ref, computed, watch } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 
 const props = defineProps({
   items: {
@@ -288,16 +330,62 @@ const props = defineProps({
 
 const emit = defineEmits(['select-item', 'back-to-map'])
 
+const route = useRoute()
+const router = useRouter()
+
 const searchQuery = ref('')
 const selectedDepartments = ref([])
 const selectedCategories = ref([])
 const selectedRooms = ref([])
 
+const deptSearchQuery = ref('')
+const catSearchQuery = ref('')
 const roomSearchQuery = ref('')
 
-const collapseDept = ref(true)
-const collapseCat = ref(true)
-const collapseRoom = ref(true)
+// Sync from URL queries to local filters on load/routing
+watch(() => route.query, (q) => {
+  searchQuery.value = q.search || ''
+  selectedDepartments.value = q.depts ? q.depts.split(',') : []
+  selectedCategories.value = q.cats ? q.cats.split(',') : []
+  selectedRooms.value = q.rooms ? q.rooms.split(',') : []
+}, { immediate: true })
+
+// Watch local filters and sync to URL queries to keep search state shareable
+watch([searchQuery, selectedDepartments, selectedCategories, selectedRooms], ([search, depts, cats, rooms]) => {
+  const query = {}
+  if (search) query.search = search
+  if (depts.length) query.depts = depts.join(',')
+  if (cats.length) query.cats = cats.join(',')
+  if (rooms.length) query.rooms = rooms.join(',')
+
+  const currentQuery = route.query
+  if (
+    currentQuery.search !== query.search ||
+    currentQuery.depts !== query.depts ||
+    currentQuery.cats !== query.cats ||
+    currentQuery.rooms !== query.rooms
+  ) {
+    router.replace({ query })
+  }
+})
+
+function getFirstImage(item) {
+  if (!item || !item.media) return null
+  const images = item.media.images
+  if (!images || !images.length) return null
+  const hl = images.find(img => typeof img === 'object' && img !== null && img.highlighted)
+  const first = hl || images[0]
+  if (typeof first === 'object' && first !== null) {
+    return first.src || first.url || first.path || null
+  }
+  return first
+}
+
+// Search queries are declared at the top of script
+
+const collapseDept = ref(false)
+const collapseCat = ref(false)
+const collapseRoom = ref(false)
 
 const showMobileFilters = ref(false)
 const displayLimit = ref(6)
@@ -361,6 +449,8 @@ function clearFilters() {
   selectedCategories.value = []
   selectedRooms.value = []
   roomSearchQuery.value = ''
+  deptSearchQuery.value = ''
+  catSearchQuery.value = ''
 }
 
 // Compute available options dynamically
@@ -404,6 +494,25 @@ const filteredRoomOptions = computed(() => {
     r.label.toLowerCase().includes(roomSearchQuery.value.toLowerCase())
   )
 })
+
+const filteredDeptOptions = computed(() => {
+  if (!deptSearchQuery.value) return departments.value
+  return departments.value.filter(d => 
+    d.toLowerCase().includes(deptSearchQuery.value.toLowerCase())
+  )
+})
+
+const filteredCatOptions = computed(() => {
+  if (!catSearchQuery.value) return categories.value
+  return categories.value.filter(c => 
+    c.toLowerCase().includes(catSearchQuery.value.toLowerCase())
+  )
+})
+
+function getCleanId(item) {
+  if (!item || !item.id) return ''
+  return item.id.split('/').pop().replace(/\.md$/, '')
+}
 
 // Filter grid items
 const filteredEquipment = computed(() => {

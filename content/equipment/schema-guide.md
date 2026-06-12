@@ -25,7 +25,7 @@ These fields must be populated in every equipment file. Omitting them will cause
 | `manufacturer` | String | The brand or manufacturer (e.g., `Agilent Technologies`). |
 | `departments` | Array of strings | List of academic divisions hosting the equipment (e.g., `["Chemistry", "Applied Physics"]`). |
 | `location` | Object | Sub-fields: `building_id` (e.g. `cluster-1`), `floor` (Integer), `room_id` (e.g. `b1-103`), `station_id` (e.g. `station-ch-1`). |
-| `media` | Object | Interactive media elements. Sub-fields: `images` (Array of absolute image or video paths), `model_3d` (Optional: path to interactive 3D model glTF/GLB file), `video` (Optional: path to standalone video file), `internal_blueprint` (Optional: vector overlay SVG schematic path), `ambient_color` (Optional HEX color). |
+| `media` | Object | Interactive media elements. Sub-fields: `images` (Array of strings or objects containing `src`, `title`, optional `position` integer, and optional `highlighted: true` boolean), `model_3d` (Optional string path or object with `src`, `title`, and `position`), `video` (Optional string path or object with `src`, `title`, and `position`), `internal_blueprint` (Optional string path or object with `src`, `title`, `position`, and optional `target_image` cover override path), `ambient_color` (Optional HEX color). |
 | `status` | String | The system status (typically `operational` or `maintenance`). |
 
 ---
@@ -106,10 +106,26 @@ location:
   station_id: "station-test-1"
 media:
   images:
-    - "/images/equipment/furnace-exterior.png"
-  video: "/images/equipment/furnace-process.mp4"
-  model_3d: "/3d/furnace.glb"
-  internal_blueprint: "/images/equipment/furnace-schematic.svg"
+    - src: "/images/equipment/furnace-exterior.png"
+      title: "Chamber Outer Profile"
+      highlighted: true  # Flags this as the main card preview image in search/tour views
+      position: 40
+    - src: "/images/equipment/sem-exterior.png"
+      title: "Scanning Microscope Detail"
+      position: 41
+  model_3d:
+    src: "/3d/furnace.glb"
+    title: "Diagnostic: 3D Chamber Model"
+    position: 10         # Custom order position in the diagnostic carousel
+  video:
+    src: "/images/equipment/furnace-process.mp4"
+    title: "Chamber Sintering Demonstration"
+    position: 30
+  internal_blueprint:
+    src: "/images/equipment/furnace-schematic.svg"
+    title: "Diagnostic: Internal Heat Loop"
+    target_image: "/images/equipment/furnace-exterior.png" # Specific cover photo to show behind the X-Ray cutout
+    position: 20
   ambient_color: "#EF5A24"
 status: "operational"
 

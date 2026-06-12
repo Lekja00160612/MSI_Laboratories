@@ -36,10 +36,48 @@ export default defineContentConfig({
           station_id: z.string()
         }),
         media: z.object({
-          images: z.array(z.string()),
-          video: z.string().optional(),
-          model_3d: z.string().optional(),
-          internal_blueprint: z.string().optional(),
+          images: z.array(z.union([
+            z.string(),
+            z.object({
+              src: z.string().optional(),
+              url: z.string().optional(),
+              path: z.string().optional(),
+              title: z.string().optional(),
+              position: z.number().optional(),
+              highlighted: z.boolean().optional()
+            })
+          ])),
+          video: z.union([
+            z.string(),
+            z.object({
+              src: z.string().optional(),
+              url: z.string().optional(),
+              path: z.string().optional(),
+              title: z.string().optional(),
+              position: z.number().optional()
+            })
+          ]).optional(),
+          model_3d: z.union([
+            z.string(),
+            z.object({
+              src: z.string().optional(),
+              url: z.string().optional(),
+              path: z.string().optional(),
+              title: z.string().optional(),
+              position: z.number().optional()
+            })
+          ]).optional(),
+          internal_blueprint: z.union([
+            z.string(),
+            z.object({
+              src: z.string().optional(),
+              url: z.string().optional(),
+              path: z.string().optional(),
+              title: z.string().optional(),
+              position: z.number().optional(),
+              target_image: z.string().optional()
+            })
+          ]).optional(),
           ambient_color: z.string().default('#EF5A24')
         }),
         status: z.string().default('operational'),

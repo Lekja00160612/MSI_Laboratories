@@ -16,24 +16,13 @@
       <!-- Top Nav controls -->
       <div class="flex items-center gap-2 sm:gap-4">
         <button 
-          @click="toggleView('map')" 
-          :class="[
-            'px-2.5 py-1 sm:px-4 sm:py-1.5 rounded-lg text-[10px] sm:text-xs font-technical border transition-all duration-300',
-            activeView === 'map' 
-              ? 'bg-[#EF5A24]/10 border-[#EF5A24] text-[#EF5A24]' 
-              : 'border-white/15 text-white/60 hover:text-white'
-          ]"
+          class="px-2.5 py-1 sm:px-4 sm:py-1.5 rounded-lg text-[10px] sm:text-xs font-technical border bg-[#EF5A24]/10 border-[#EF5A24] text-[#EF5A24] transition-all duration-300"
         >
           INTERACTIVE MAP
         </button>
         <button 
-          @click="toggleView('queries')" 
-          :class="[
-            'px-2.5 py-1 sm:px-4 sm:py-1.5 rounded-lg text-[10px] sm:text-xs font-technical border transition-all duration-300',
-            activeView === 'queries' 
-              ? 'bg-[#EF5A24]/10 border-[#EF5A24] text-[#EF5A24]' 
-              : 'border-white/15 text-white/60 hover:text-white'
-          ]"
+          @click="goToQueries" 
+          class="px-2.5 py-1 sm:px-4 sm:py-1.5 rounded-lg text-[10px] sm:text-xs font-technical border border-white/15 text-white/60 hover:text-white transition-all duration-300 cursor-pointer"
         >
           ALL INSTRUMENTS
         </button>
@@ -43,7 +32,7 @@
     <!-- Main View Switcher -->
     <main class="flex-grow relative overflow-hidden">
       <!-- 1. Interactive Spatial Map View -->
-      <div v-show="activeView === 'map'" class="w-full h-full flex flex-col md:flex-row relative">
+      <div class="w-full h-full flex flex-col md:flex-row relative">
         <!-- Sidebar Navigation (Desktop) -->
         <aside 
           :class="[
@@ -228,7 +217,7 @@
                   >
                     <!-- Thumb image -->
                     <div class="w-16 h-12 bg-slate-950 rounded overflow-hidden shrink-0 border border-white/10">
-                      <NuxtImg v-if="mach.media?.images?.length" :src="mach.media.images[0]" format="avif" class="w-full h-full object-cover" />
+                      <NuxtImg v-if="mach.media?.images?.length" :src="getFirstImage(mach)" format="avif" class="w-full h-full object-cover" />
                     </div>
                     <div class="flex-grow min-w-0">
                       <div class="text-[9px] font-technical text-white/40">{{ mach.manufacturer }} // {{ mach.model }}</div>
@@ -257,42 +246,9 @@
         </Transition>
       </div>
 
-      <!-- 2. Map-Free All Queries Search View -->
-      <div v-show="activeView === 'queries'" class="w-full h-full bg-[#070A12]">
-        <AllQueriesView 
-          :items="equipment" 
-          @back-to-map="toggleView('map')" 
-          @select-item="openEquipmentDetail"
-        />
-      </div>
+      <!-- AllQueriesView has been moved to its own page at /equipment -->
 
-      <!-- Overlapping Immersive Equipment Profile Drawer -->
-      <Transition name="slide-in">
-        <div 
-          v-if="selectedEquipment" 
-          class="fixed inset-0 z-[60] w-full h-full bg-[#070A12] shadow-2xl"
-        >
-          <EquipmentDetail 
-            :item="selectedEquipment" 
-            @close="closeEquipmentDetail" 
-          />
-        </div>
-      </Transition>
-
-      <!-- Fullscreen Immersive Lab Room Tour View -->
-      <Transition name="slide-in">
-        <div 
-          v-if="selectedRoomTour" 
-          class="fixed inset-0 z-50 w-full h-full bg-[#070A12] shadow-2xl"
-        >
-          <LabRoomTour 
-            :room="selectedRoomTour" 
-            :equipment="roomTourEquipment" 
-            @close="closeRoomTour" 
-            @select-equipment="openEquipmentDetailFromTour"
-          />
-        </div>
-      </Transition>
+      <!-- Overlays migrated to dedicated /tour and /equipment pages -->
     </main>
   </div>
 </template>
@@ -300,20 +256,64 @@
 <script setup>
 import { ref, computed, watch } from 'vue'
 
-const activeView = ref('map')
+import { useRoute, useRouter } from 'vue-router'
+
 const selectedBuilding = ref(null)
 const selectedFloor = ref(null)
 const selectedRoomId = ref(null)
-const selectedEquipment = ref(null)
-const selectedRoomTour = ref(null)
 const isMapFullscreen = ref(false)
+
+const route = useRoute()
+const router = useRouter()
+
+// Sync route queries to restore focused campus map states on page load/navigation
+watch(() => route.query, (newQuery) => {
+  selectedBuilding.value = newQuery.building || null
+  selectedFloor.value = newQuery.floor ? parseInt(newQuery.floor) : null
+  selectedRoomId.value = newQuery.room || null
+}, { immediate: true })
+
+// Watch map selection states and update URL queries accordingly to preserve state transparency
+watch([selectedBuilding, selectedFloor, selectedRoomId], ([b, f, r]) => {
+  const query = {}
+  if (b) query.building = b
+  if (f) query.floor = String(f)
+  if (r) query.room = r
+  
+  const currentQuery = route.query
+  if (
+    currentQuery.building !== query.building ||
+    currentQuery.floor !== query.floor ||
+    currentQuery.room !== query.room
+  ) {
+    router.replace({ query })
+  }
+})
+
+function getFirstImage(mach) {
+  if (!mach || !mach.media) return null
+  const images = mach.media.images
+  if (!images || !images.length) return null
+  const hl = images.find(img => typeof img === 'object' && img !== null && img.highlighted)
+  const first = hl || images[0]
+  if (typeof first === 'object' && first !== null) {
+    return first.src || first.url || first.path || null
+  }
+  return first
+}
 
 // 1. Fetch data collections from Nuxt Content v3
 const { data: labs } = await useAsyncData('labs', () => queryCollection('labs').all())
 const { data: equipment } = await useAsyncData('equipment', () => queryCollection('equipment').all())
 
 const labsList = computed(() => labs.value || [])
-const equipmentList = computed(() => equipment.value || [])
+const equipmentList = computed(() => {
+  return (equipment.value || []).filter(item => {
+    const id = item.id || item._path || ''
+    const baseId = id.split('/').pop().replace(/\.md$/, '')
+    return baseId !== 'schema-guide' && !id.includes('schema-guide')
+  })
+})
 
 // 2. Fetch the floorplan GeoJSON dynamically in the parent to support comprehensive room listing
 const currentFloorGeojson = ref(null)
@@ -408,12 +408,7 @@ const highlightedMachines = computed(() => {
   })
 })
 
-const roomTourEquipment = computed(() => {
-  if (!selectedRoomTour.value) return []
-  return equipmentList.value.filter(
-    mach => mach.location?.room_id === selectedRoomTour.value.room_id
-  )
-})
+
 
 // 4. Cluster dynamic stats telemetry
 const clusterTelemetry = computed(() => {
@@ -439,13 +434,6 @@ const clusterTelemetry = computed(() => {
 })
 
 // 3. Selection Handlers
-function toggleView(viewName) {
-  activeView.value = viewName
-  if (viewName !== 'map') {
-    isMapFullscreen.value = false
-  }
-}
-
 function selectBuilding(buildingId) {
   selectedBuilding.value = buildingId
   selectedFloor.value = 1 // default to floor 1
@@ -471,28 +459,21 @@ function closeRoomDrawer() {
   selectedRoomId.value = null
 }
 
+function getCleanId(mach) {
+  if (!mach || !mach.id) return ''
+  return mach.id.split('/').pop().replace(/\.md$/, '')
+}
+
 function openEquipmentDetail(mach) {
-  selectedEquipment.value = mach
+  router.push(`/equipment/${getCleanId(mach)}`)
 }
 
-function closeEquipmentDetail() {
-  selectedEquipment.value = null
-}
-
-function openAllQueriesForRoom() {
-  activeView.value = 'queries'
+function goToQueries() {
+  router.push('/equipment')
 }
 
 function openRoomTour(room) {
-  selectedRoomTour.value = room
-}
-
-function closeRoomTour() {
-  selectedRoomTour.value = null
-}
-
-function openEquipmentDetailFromTour(mach) {
-  selectedEquipment.value = mach
+  router.push(`/tour/${room.room_id}`)
 }
 </script>
 

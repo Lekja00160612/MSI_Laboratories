@@ -41,9 +41,12 @@
       class="flex-grow snap-y snap-mandatory scroll-smooth overflow-y-auto w-full h-full"
     >
       <!-- Slide 0: Lab Overview / Introduction -->
-      <section class="h-screen w-full snap-start shrink-0 relative flex flex-col lg:flex-row pt-16 overflow-hidden">
+      <section class="h-auto lg:h-screen w-full snap-none lg:snap-start shrink-0 relative flex flex-col lg:flex-row lg:pt-16 bg-[#070A12]">
         <!-- Left Column: Intimidating Widescreen Lab Image & Reticle HUD -->
-        <div class="lg:w-3/5 relative h-1/2 lg:h-full overflow-hidden border-b lg:border-b-0 lg:border-r border-white/10 bg-black flex items-center justify-center">
+        <div 
+          ref="slide0Image"
+          class="w-full lg:w-3/5 relative h-screen lg:h-full snap-start shrink-0 overflow-hidden border-b lg:border-b-0 lg:border-r border-white/10 bg-black flex items-center justify-center pt-16 lg:pt-0"
+        >
           <NuxtImg 
             :src="labImages[0]" 
             format="avif"
@@ -85,11 +88,34 @@
               <span class="text-[#EF5A24] font-bold">GRID CALIBRATION:</span> ACTIVE
             </div>
           </div>
+          <!-- Mobile Navigation Button -->
+          <div class="lg:hidden absolute bottom-20 left-1/2 -translate-x-1/2 z-45">
+            <button 
+              @click="scrollToSlide0Details" 
+              class="px-5 py-2.5 rounded-lg border border-[#EF5A24] bg-[#EF5A24]/20 hover:bg-[#EF5A24]/30 text-[10px] font-technical uppercase font-bold tracking-widest text-white flex items-center gap-2 shadow-[0_0_15px_rgba(239,90,36,0.3)] active:scale-95 transition-all"
+            >
+              <span>Read Lab Details</span>
+              <UIcon name="i-lucide-arrow-down" class="w-4 h-4 text-[#EF5A24] animate-bounce" />
+            </button>
+          </div>
         </div>
 
         <!-- Right Column: Lab Profile Specs & Safe Instructions -->
-        <div class="lg:w-2/5 relative h-1/2 lg:h-full overflow-y-auto p-6 md:p-8 flex flex-col gap-6 bg-[#0F1E36]/10">
-          <div class="flex flex-col gap-1">
+        <div 
+          ref="slide0Details"
+          class="w-full lg:w-2/5 relative h-screen lg:h-full p-6 md:p-8 pt-20 lg:pt-8 flex flex-col gap-4 bg-[#0F1E36]/90 backdrop-blur-md snap-start shrink-0 overflow-y-auto"
+        >
+          <!-- Back to image button for mobile -->
+          <div class="lg:hidden shrink-0 mb-1">
+            <button 
+              @click="scrollToSlide0Image" 
+              class="px-4 py-2 rounded-lg border border-[#EF5A24]/30 bg-[#EF5A24]/5 hover:bg-[#EF5A24]/10 text-[9px] font-technical uppercase font-bold tracking-widest text-[#EF5A24] flex items-center gap-1.5 active:scale-95 transition-all"
+            >
+              <UIcon name="i-lucide-arrow-up" class="w-3.5 h-3.5" />
+              <span>Back to Lab Image</span>
+            </button>
+          </div>
+          <div class="flex flex-col gap-1 shrink-0">
             <span class="text-[#EF5A24] text-xs font-technical uppercase font-extrabold tracking-widest">LAB MANDATE</span>
             <h2 class="text-xl md:text-2xl font-extrabold text-white leading-snug">{{ room.name }}</h2>
             <div class="flex gap-2 flex-wrap mt-2">
@@ -99,50 +125,53 @@
             </div>
           </div>
 
-          <!-- Leadership Card -->
-          <UCard class="bg-[#0F1E36]/40 border border-[#06B6D4]/20">
-            <template #header>
-              <div class="text-[#06B6D4] text-[10px] font-technical uppercase font-bold tracking-wider">Laboratory Leadership</div>
-            </template>
-            <div class="flex items-center gap-4 text-xs">
-              <div class="w-10 h-10 rounded-lg bg-[#0C2B5C] border border-[#06B6D4]/30 flex items-center justify-center text-[#06B6D4] font-bold text-base">
-                {{ room.head_of_lab?.name?.split(' ').pop().charAt(0) || '?' }}
+          <!-- Internally Scrollable Details Area -->
+          <div class="flex-grow overflow-y-auto pr-1 flex flex-col gap-4 my-2">
+            <!-- Leadership Card -->
+            <UCard class="bg-[#0F1E36]/40 border border-[#06B6D4]/20 shrink-0">
+              <template #header>
+                <div class="text-[#06B6D4] text-[10px] font-technical uppercase font-bold tracking-wider">Laboratory Leadership</div>
+              </template>
+              <div class="flex items-center gap-4 text-xs">
+                <div class="w-10 h-10 rounded-lg bg-[#0C2B5C] border border-[#06B6D4]/30 flex items-center justify-center text-[#06B6D4] font-bold text-base">
+                  {{ room.head_of_lab?.name?.split(' ').pop().charAt(0) || '?' }}
+                </div>
+                <div>
+                  <div class="font-bold text-white leading-tight">{{ room.head_of_lab?.name }}</div>
+                  <div class="text-white/50 text-[11px] mt-0.5">Coordinator // Office: {{ room.head_of_lab?.office }}</div>
+                  <div class="text-[#06B6D4] font-technical text-[10px] mt-0.5">{{ room.head_of_lab?.email }}</div>
+                </div>
               </div>
-              <div>
-                <div class="font-bold text-white leading-tight">{{ room.head_of_lab?.name }}</div>
-                <div class="text-white/50 text-[11px] mt-0.5">Coordinator // Office: {{ room.head_of_lab?.office }}</div>
-                <div class="text-[#06B6D4] font-technical text-[10px] mt-0.5">{{ room.head_of_lab?.email }}</div>
-              </div>
-            </div>
-          </UCard>
+            </UCard>
 
-          <!-- Narrative Overview -->
-          <div class="text-xs text-white/80 leading-relaxed bg-[#0F1E36]/20 p-5 rounded-lg border border-white/5 select-text">
-            <h3 class="text-xs font-technical uppercase font-bold text-[#EF5A24] tracking-widest mb-2">Research Spectrum</h3>
-            <ContentRenderer :value="room" />
+            <!-- Narrative Overview -->
+            <div class="text-xs text-white/80 leading-relaxed bg-[#0F1E36]/20 p-5 rounded-lg border border-white/5 select-text shrink-0">
+              <h3 class="text-xs font-technical uppercase font-bold text-[#EF5A24] tracking-widest mb-2">Research Spectrum</h3>
+              <ContentRenderer :value="room" />
+            </div>
+
+            <!-- Safety checklist -->
+            <UCard class="bg-[#0F1E36]/20 border border-white/10 text-xs shrink-0">
+              <template #header>
+                <div class="text-white/40 font-technical uppercase font-bold text-[9px] tracking-wider">Personal Protective Equipment Rules</div>
+              </template>
+              <ul class="flex flex-col gap-2.5 list-disc pl-4 text-white/70">
+                <li>Safety shields and heat protective mitts mandatory when running high-temperature furnaces.</li>
+                <li>Fume suction cabinets must remain fully operational for compound evaporation.</li>
+                <li>Keep log ledger populated with correct entry/exit parameters.</li>
+              </ul>
+            </UCard>
           </div>
 
-          <!-- Safety checklist -->
-          <UCard class="bg-[#0F1E36]/20 border border-white/10 text-xs">
-            <template #header>
-              <div class="text-white/40 font-technical uppercase font-bold text-[9px] tracking-wider">Personal Protective Equipment Rules</div>
-            </template>
-            <ul class="flex flex-col gap-2.5 list-disc pl-4 text-white/70">
-              <li>Safety shields and heat protective mitts mandatory when running high-temperature furnaces.</li>
-              <li>Fume suction cabinets must remain fully operational for compound evaporation.</li>
-              <li>Keep log ledger populated with correct entry/exit parameters.</li>
-            </ul>
-          </UCard>
-
-          <!-- Scroll Prompter Button at bottom of intro -->
-          <div class="mt-auto pt-6 flex justify-center">
+          <!-- Scroll Prompter Button at bottom of intro (Fixed) -->
+          <div class="pt-4 flex justify-center shrink-0 border-t border-white/10 mt-auto">
             <UButton 
               v-if="equipment.length"
               @click="scrollToNext(1)"
               icon="i-lucide-arrow-down"
               color="primary"
               variant="outline"
-              class="font-technical text-xs uppercase tracking-widest border-[#EF5A24]/40 text-[#EF5A24] hover:bg-[#EF5A24]/10 hover:text-white"
+              class="font-technical text-xs uppercase tracking-widest border-[#EF5A24]/40 text-[#EF5A24] hover:bg-[#EF5A24]/10 hover:text-white w-full justify-center"
             >
               SCROLL TO INSTRUMENTS ({{ equipment.length }})
             </UButton>
@@ -157,12 +186,13 @@
         class="h-screen w-full snap-start shrink-0 relative flex flex-col justify-center items-center lg:items-start p-6 lg:p-16 pt-20 bg-black overflow-hidden"
       >
         <!-- Widescreen Background Equipment Image -->
-        <div class="absolute inset-0 z-10 flex items-center justify-center bg-black">
+        <div class="absolute inset-0 z-10 flex items-center justify-center bg-black overflow-hidden">
           <NuxtImg 
             v-if="mach.media?.images?.length"
-            :src="mach.media.images[0]" 
+            :src="getFirstImage(mach)" 
             format="avif"
-            class="w-full h-full object-cover filter brightness-[0.35] contrast-[1.15]" 
+            class="w-full h-full object-cover filter brightness-[0.35] contrast-[1.15] transition-transform duration-[8000ms] ease-out" 
+            :class="currentSlideIndex === (isMobileView ? idx + 2 : idx + 1) ? 'scale-105' : 'scale-100'"
             :alt="mach.title"
           />
           <div class="absolute inset-0 bg-gradient-to-r from-black/80 via-transparent to-black/80"></div>
@@ -170,7 +200,10 @@
         </div>
 
         <!-- Float Holographic Detail Card with dynamic tabs -->
-        <div class="z-30 max-w-xl w-full lg:w-auto mx-auto lg:mx-0 lg:ml-16 shrink-0 my-auto">
+        <div 
+          class="z-30 max-w-xl w-full lg:w-auto mx-auto lg:mx-0 lg:ml-16 shrink-0 my-auto transition-all duration-[800ms] delay-100 ease-out"
+          :class="currentSlideIndex === (isMobileView ? idx + 2 : idx + 1) ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'"
+        >
           <div class="vgu-panel p-5 border border-[#EF5A24]/30 shadow-2xl rounded-xl bg-[#0F1E36]/90 backdrop-blur-md flex flex-col gap-3.5 w-[92vw] sm:w-[500px] h-[440px] md:h-[480px]">
             <div>
               <div class="text-[#EF5A24] text-[10px] font-technical uppercase font-bold tracking-widest leading-none">
@@ -300,7 +333,7 @@
       class="fixed bottom-6 right-6 z-45 flex items-center gap-3"
     >
       <UButton 
-        v-if="currentSlideIndex < equipment.length"
+        v-if="currentSlideIndex < (isMobileView ? equipment.length + 1 : equipment.length)"
         @click="scrollToNext(currentSlideIndex + 1)"
         icon="i-lucide-arrow-down"
         color="neutral"
@@ -324,7 +357,13 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
+import { useMediaQuery } from '@vueuse/core'
+
+const route = useRoute()
+const router = useRouter()
+const isMobileView = useMediaQuery('(max-width: 1023px)')
 
 const props = defineProps({
   room: {
@@ -343,10 +382,33 @@ const scrollContainer = ref(null)
 const scrollPercent = ref(0)
 const currentSlideIndex = ref(0)
 
+const slide0Image = ref(null)
+const slide0Details = ref(null)
+
+function scrollToSlide0Details() {
+  slide0Details.value?.scrollIntoView({ behavior: 'smooth' })
+}
+
+function scrollToSlide0Image() {
+  slide0Image.value?.scrollIntoView({ behavior: 'smooth' })
+}
+
 const activeImageIndex = ref(0)
 const isHovering = ref(false)
 const mouseX = ref(50)
 const mouseY = ref(50)
+
+function getFirstImage(mach) {
+  if (!mach || !mach.media) return null
+  const images = mach.media.images
+  if (!images || !images.length) return null
+  const hl = images.find(img => typeof img === 'object' && img !== null && img.highlighted)
+  const first = hl || images[0]
+  if (typeof first === 'object' && first !== null) {
+    return first.src || first.url || first.path || null
+  }
+  return first
+}
 
 // Keep track of active tabs for each equipment machine locally
 const activeTabsMap = ref({})
@@ -428,6 +490,12 @@ const labImages = computed(() => {
   }
 })
 
+// Helper to get clean machine ID matching path
+function getCleanId(mach) {
+  if (!mach || !mach.id) return ''
+  return mach.id.split('/').pop().replace(/\.md$/, '')
+}
+
 // Scroll position listener
 function handleScroll() {
   if (!scrollContainer.value) return
@@ -447,12 +515,52 @@ function handleScroll() {
   }
 }
 
+let debounceTimeout = null
+
+// Watch currentSlideIndex and sync to URL query parameter with 300ms debounce
+watch(currentSlideIndex, (idx) => {
+  if (debounceTimeout) clearTimeout(debounceTimeout)
+  debounceTimeout = setTimeout(() => {
+    const query = { ...route.query }
+    const offset = isMobileView.value ? 2 : 1
+    if (idx < offset) {
+      delete query.mach
+    } else {
+      const mach = props.equipment[idx - offset]
+      if (mach) {
+        query.mach = getCleanId(mach)
+      }
+    }
+    
+    if (route.query.mach !== query.mach) {
+      router.replace({ query })
+    }
+  }, 300)
+})
+
 // Next slide scroller
-function scrollToNext(idx) {
+function scrollToNext(idx, smooth = true) {
   if (!scrollContainer.value) return
-  const slides = scrollContainer.value.querySelectorAll('section')
-  if (slides[idx]) {
-    slides[idx].scrollIntoView({ behavior: 'smooth' })
+  const behavior = smooth ? 'smooth' : 'auto'
+  if (isMobileView.value) {
+    if (idx === 0) {
+      slide0Image.value?.scrollIntoView({ behavior })
+    } else if (idx === 1) {
+      slide0Details.value?.scrollIntoView({ behavior })
+    } else {
+      const machineSections = scrollContainer.value.querySelectorAll('section')
+      // machineSections[0] is Slide 0 parent.
+      // machineSections[1] is Slide 1 (idx = 2).
+      const targetSection = machineSections[idx - 1]
+      if (targetSection) {
+        targetSection.scrollIntoView({ behavior })
+      }
+    }
+  } else {
+    const slides = scrollContainer.value.querySelectorAll('section')
+    if (slides[idx]) {
+      slides[idx].scrollIntoView({ behavior })
+    }
   }
 }
 
@@ -460,6 +568,28 @@ function scrollToTop() {
   if (!scrollContainer.value) return
   scrollContainer.value.scrollTo({ top: 0, behavior: 'smooth' })
 }
+
+function scrollToActiveMachine() {
+  if (!route.query.mach || !props.equipment.length || !scrollContainer.value) return
+  const targetId = route.query.mach
+  const targetIdx = props.equipment.findIndex(mach => getCleanId(mach) === targetId)
+  if (targetIdx !== -1) {
+    const slideIdx = targetIdx + (isMobileView.value ? 2 : 1)
+    setTimeout(() => {
+      scrollToNext(slideIdx, false)
+    }, 100)
+  }
+}
+
+// Scroll on mount
+onMounted(() => {
+  scrollToActiveMachine()
+})
+
+// Scroll if equipment array changes later
+watch(() => props.equipment, () => {
+  scrollToActiveMachine()
+}, { deep: true })
 
 // Targeting crosshair coordinate calculations
 function handleMouseMove(e) {
@@ -478,12 +608,17 @@ function handleMouseLeave() {
 <style scoped>
 .fade-enter-active,
 .fade-leave-active {
-  transition: opacity 0.15s ease;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.fade-enter-from,
+.fade-enter-from {
+  opacity: 0;
+  transform: translateY(6px);
+}
+
 .fade-leave-to {
   opacity: 0;
+  transform: translateY(-6px);
 }
 
 .scrollbar-none::-webkit-scrollbar {
