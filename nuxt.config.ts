@@ -1,5 +1,47 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 import { execSync } from 'child_process'
+import fs from 'fs'
+import path from 'path'
+
+// Helper to recursively find markdown files in content/labs
+function getLabRoutes() {
+  const routes: string[] = []
+  const labsDir = path.resolve(__dirname, 'content/labs')
+  if (!fs.existsSync(labsDir)) return routes
+
+  function traverse(dir: string) {
+    const files = fs.readdirSync(dir)
+    for (const file of files) {
+      const fullPath = path.join(dir, file)
+      const stat = fs.statSync(fullPath)
+      if (stat.isDirectory()) {
+        traverse(fullPath)
+      } else if (file.endsWith('.md')) {
+        const id = file.replace(/\.md$/, '')
+        routes.push(`/tour/${id}`)
+      }
+    }
+  }
+  
+  traverse(labsDir)
+  return routes
+}
+
+// Helper to find equipment markdown files
+function getEquipmentRoutes() {
+  const routes: string[] = []
+  const equipDir = path.resolve(__dirname, 'content/equipment')
+  if (!fs.existsSync(equipDir)) return routes
+
+  const files = fs.readdirSync(equipDir)
+  for (const file of files) {
+    if (file.endsWith('.md') && file !== 'schema-guide.md') {
+      const id = file.replace(/\.md$/, '')
+      routes.push(`/equipment/${id}`)
+    }
+  }
+  return routes
+}
 
 export default defineNuxtConfig({
   compatibilityDate: '2025-07-15',
@@ -183,6 +225,10 @@ export default defineNuxtConfig({
     // 4. Align Nuxt's routing with Cloudflare's strict URL matching
     prerender: {
       autoSubfolderIndex: false,
+      routes: [
+        ...getLabRoutes(),
+        ...getEquipmentRoutes()
+      ]
     }
   }
 })

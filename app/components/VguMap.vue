@@ -192,10 +192,10 @@ onMounted(async () => {
         }
       ]
     },
-    center: [106.6155, 11.1083],
-    zoom: defaultZoomLevel.value,
-    pitch: 45,
-    bearing: -20
+    center: props.selectedBuilding ? (buildingCenters[props.selectedBuilding] || [106.6155, 11.1083]) : [106.6155, 11.1083],
+    zoom: props.selectedBuilding ? 18.2 : defaultZoomLevel.value,
+    pitch: props.selectedBuilding ? 0 : 45,
+    bearing: props.selectedBuilding ? 0 : -20
   })
   if (typeof window !== 'undefined') {
     window.map = map
@@ -358,7 +358,7 @@ onMounted(async () => {
       map.getCanvas().style.cursor = ''
     })
 
-    // If a building is already selected on load, apply initial filters
+    // If a building is already selected on load, apply initial filters and zoom
     if (props.selectedBuilding) {
       map.setFilter('vgu-buildings-extrusion', ['!=', ['get', 'building_id'], props.selectedBuilding])
       map.setFilter('vgu-buildings-outline', ['!=', ['get', 'building_id'], props.selectedBuilding])
@@ -370,6 +370,20 @@ onMounted(async () => {
       
       if (props.selectedFloor) {
         loadFloorplan(props.selectedFloor)
+      }
+
+      // Induce camera zoom-in transition smoothly after style loads
+      if (!props.selectedRoomId) {
+        const coords = buildingCenters[props.selectedBuilding] || [106.6155, 11.1083]
+        setTimeout(() => {
+          map.flyTo({
+            center: coords,
+            zoom: 19.5,
+            pitch: 0,
+            bearing: 0,
+            duration: 1500
+          })
+        }, 100)
       }
     } else {
       renderClusterLabels()
