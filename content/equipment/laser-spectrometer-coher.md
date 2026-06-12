@@ -3,6 +3,7 @@ id: "laser-spectrometer-coher"
 title: "Laser Spectrometer"
 model: "Coherent Libra-F"
 manufacturer: "Coherent Inc."
+category: "Optical Spectroscopy"
 departments:
   - "Applied Physics"
 location:
@@ -14,20 +15,21 @@ media:
   images:
     - "/images/equipment/laser-exterior.png"
   ambient_color: "#8B5CF6"
-physics:
-  primary_mechanism: "Optoelectronic Spectroscopy"
-  mathematical_model: "Planck-Einstein Relation"
-  equation: "E = h\\nu"
-  target_materials:
-    - "Semiconductor thin films"
-    - "Laser dye solutions"
-specifications:
-  output_wavelength: "800 nm"
-  pulse_duration: "< 100 fs"
-  energy_per_pulse: "4 mJ"
-links:
-  - title: "Coherent Laser Safety Guide"
-    url: "https://vgu.edu.vn/coherent-safety"
+optional_information:
+  physics:
+    primary_mechanism: "Optoelectronic Spectroscopy"
+    mathematical_model: "Planck-Einstein Relation"
+    equation: "E = h\\nu"
+    target_materials:
+      - "Semiconductor thin films"
+      - "Laser dye solutions"
+  specifications:
+    output_wavelength: "800 nm"
+    pulse_duration: "< 100 fs"
+    energy_per_pulse: "4 mJ"
+  links:
+    - title: "Coherent Laser Safety Guide"
+      url: "https://vgu.edu.vn/coherent-safety"
 status: "operational"
 ---
 

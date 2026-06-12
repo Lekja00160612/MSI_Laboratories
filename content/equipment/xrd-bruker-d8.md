@@ -3,6 +3,7 @@ id: "xrd-bruker-d8"
 title: "High-Resolution X-Ray Diffractometer"
 model: "D8 Advance"
 manufacturer: "Bruker"
+category: "X-Ray Analysis"
 departments:
   - "Materials Science and Engineering"
   - "Applied Physics"
@@ -17,23 +18,24 @@ media:
     - "/images/equipment/xrd-front.png"
   internal_blueprint: "/images/equipment/xrd-schematic.svg"
   ambient_color: "#EF5A24"
-physics:
-  primary_mechanism: "Constructive X-Ray Interference"
-  mathematical_model: "Bragg's Law"
-  equation: "n\\lambda = 2d \\sin\\theta"
-  target_materials:
-    - "Crystalline Powders"
-    - "Thin Films"
-specifications:
-  voltage: "40 kV"
-  current: "40 mA"
-  detector: "LYNXEYE XE-T"
-  radiation_source: "Cu K-alpha (\\lambda = 1.5418 Å)"
-links:
-  - title: "VGU Booking Portal"
-    url: "https://booking.vgu.edu.vn/xrd"
-  - title: "Bragg Scattering Guide (Physics LibreTexts)"
-    url: "https://phys.libretexts.org/Bragg_Scattering"
+optional_information:
+  physics:
+    primary_mechanism: "Constructive X-Ray Interference"
+    mathematical_model: "Bragg's Law"
+    equation: "n\\lambda = 2d \\sin\\theta"
+    target_materials:
+      - "Crystalline Powders"
+      - "Thin Films"
+  specifications:
+    voltage: "40 kV"
+    current: "40 mA"
+    detector: "LYNXEYE XE-T"
+    radiation_source: "Cu K-alpha (\\lambda = 1.5418 Å)"
+  links:
+    - title: "VGU Booking Portal"
+      url: "https://booking.vgu.edu.vn/xrd"
+    - title: "Bragg Scattering Guide (Physics LibreTexts)"
+      url: "https://phys.libretexts.org/Bragg_Scattering"
 status: "operational"
 ---
 

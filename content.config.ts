@@ -37,22 +37,27 @@ export default defineContentConfig({
         }),
         media: z.object({
           images: z.array(z.string()),
+          video: z.string().optional(),
+          model_3d: z.string().optional(),
           internal_blueprint: z.string().optional(),
           ambient_color: z.string().default('#EF5A24')
         }),
-        physics: z.object({
-          primary_mechanism: z.string(),
-          mathematical_model: z.string(),
-          equation: z.string(),
-          target_materials: z.array(z.string())
-        }).optional(),
-        specifications: z.record(z.string()).optional(),
-        links: z.array(z.object({
-          title: z.string(),
-          url: z.string()
-        })).optional(),
-        status: z.string().default('operational')
-      }).catchall(z.any())
+        status: z.string().default('operational'),
+        category: z.string().optional(),
+        optional_information: z.object({
+          physics: z.object({
+            primary_mechanism: z.string(),
+            mathematical_model: z.string(),
+            equation: z.string(),
+            target_materials: z.array(z.string())
+          }).optional(),
+          specifications: z.record(z.string()).optional(),
+          links: z.array(z.object({
+            title: z.string(),
+            url: z.string()
+          })).optional()
+        }).catchall(z.any()).optional()
+      })
     })
   }
 })

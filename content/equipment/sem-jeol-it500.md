@@ -3,6 +3,7 @@ id: "sem-jeol-it500"
 title: "Scanning Electron Microscope"
 model: "JSM-IT500"
 manufacturer: "JEOL"
+category: "Microscopy"
 departments:
   - "Materials Science and Engineering"
   - "Electrical Engineering"
@@ -17,20 +18,21 @@ media:
     - "/images/equipment/sem-ui.png"
   internal_blueprint: "/images/equipment/sem-schematic.svg"
   ambient_color: "#EF5A24"
-physics:
-  primary_mechanism: "Focused Electron Beam Scattering"
-  mathematical_model: "De Broglie Wavelength"
-  equation: "\\lambda = \\frac{h}{p}"
-  target_materials:
-    - "Metallic fracture surfaces"
-    - "Micro-fabricated sensors"
-specifications:
-  magnification: "5x to 300,000x"
-  acceleration_voltage: "0.3 to 30 kV"
-  electron_source: "Tungsten Filament"
-links:
-  - title: "SEM Imaging Protocol"
-    url: "https://vgu.edu.vn/sem-guide"
+optional_information:
+  physics:
+    primary_mechanism: "Focused Electron Beam Scattering"
+    mathematical_model: "De Broglie Wavelength"
+    equation: "\\lambda = \\frac{h}{p}"
+    target_materials:
+      - "Metallic fracture surfaces"
+      - "Micro-fabricated sensors"
+  specifications:
+    magnification: "5x to 300,000x"
+    acceleration_voltage: "0.3 to 30 kV"
+    electron_source: "Tungsten Filament"
+  links:
+    - title: "SEM Imaging Protocol"
+      url: "https://vgu.edu.vn/sem-guide"
 status: "operational"
 ---
 

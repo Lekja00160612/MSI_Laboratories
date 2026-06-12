@@ -3,6 +3,7 @@ id: "concrete-compression-tester"
 title: "Digital Compression Machine"
 model: "Controls Pilot PRO 300"
 manufacturer: "Controls Group"
+category: "Material Testing"
 departments:
   - "Civil Engineering"
 location:
@@ -14,20 +15,21 @@ media:
   images:
     - "/images/equipment/concrete-exterior.png"
   ambient_color: "#6B7280"
-physics:
-  primary_mechanism: "Hydraulic Load Application"
-  mathematical_model: "Compressive Stress"
-  equation: "\\sigma = \\frac{F}{A}"
-  target_materials:
-    - "Concrete cylinders"
-    - "Brick blocks"
-specifications:
-  capacity: "3000 kN"
-  hydraulic_accuracy: "Class 1"
-  piston_travel: "50 mm"
-links:
-  - title: "Concrete Strength Standards"
-    url: "https://vgu.edu.vn/concrete-standard"
+optional_information:
+  physics:
+    primary_mechanism: "Hydraulic Load Application"
+    mathematical_model: "Compressive Stress"
+    equation: "\\sigma = \\frac{F}{A}"
+    target_materials:
+      - "Concrete cylinders"
+      - "Brick blocks"
+  specifications:
+    capacity: "3000 kN"
+    hydraulic_accuracy: "Class 1"
+    piston_travel: "50 mm"
+  links:
+    - title: "Concrete Strength Standards"
+      url: "https://vgu.edu.vn/concrete-standard"
 status: "operational"
 ---
 

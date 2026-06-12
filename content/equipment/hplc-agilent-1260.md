@@ -3,6 +3,7 @@ id: "hplc-agilent-1260"
 title: "High-Performance Liquid Chromatograph"
 model: "Agilent Infinity 1260"
 manufacturer: "Agilent Technologies"
+category: "Chemical Analysis"
 departments:
   - "Chemistry"
 location:
@@ -14,20 +15,21 @@ media:
   images:
     - "/images/equipment/hplc-exterior.png"
   ambient_color: "#EC4899"
-physics:
-  primary_mechanism: "High Pressure Liquid Phase Separation"
-  mathematical_model: "Van Deemter Equation"
-  equation: "H = A + \\frac{B}{u} + C \\cdot u"
-  target_materials:
-    - "Organic solvent mixtures"
-    - "Polymer solutions"
-specifications:
-  pressure_range: "Up to 600 bar"
-  flow_range: "0.05 to 5.0 mL/min"
-  detector: "Diode Array Detector (DAD)"
-links:
-  - title: "Agilent 1260 Protocol"
-    url: "https://vgu.edu.vn/agilent-guide"
+optional_information:
+  physics:
+    primary_mechanism: "High Pressure Liquid Phase Separation"
+    mathematical_model: "Van Deemter Equation"
+    equation: "H = A + \\frac{B}{u} + C \\cdot u"
+    target_materials:
+      - "Organic solvent mixtures"
+      - "Polymer solutions"
+  specifications:
+    pressure_range: "Up to 600 bar"
+    flow_range: "0.05 to 5.0 mL/min"
+    detector: "Diode Array Detector (DAD)"
+  links:
+    - title: "Agilent 1260 Protocol"
+      url: "https://vgu.edu.vn/agilent-guide"
 status: "operational"
 ---
 

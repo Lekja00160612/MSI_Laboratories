@@ -216,7 +216,7 @@
               </div>
 
               <!-- B. Dynamic Frontmatter Field Tabs -->
-              <div v-else-if="item[activeTab]" class="flex flex-col gap-6">
+              <div v-else-if="item.optional_information?.[activeTab]" class="flex flex-col gap-6">
                 <!-- Case 1: Physics Tab -->
                 <div v-if="activeTab === 'physics'" class="flex flex-col gap-5">
                   <UCard class="bg-[#0F1E36]/40 border border-[#06B6D4]/30 shadow-lg">
@@ -225,20 +225,20 @@
                         Physics & Primary Mechanism
                       </div>
                     </template>
-                    <div class="text-sm font-semibold text-white/95">{{ item.physics?.primary_mechanism }}</div>
-                    <div class="text-xs text-white/60 mt-1">Mathematical Model: {{ item.physics?.mathematical_model }}</div>
-                    <div v-if="item.physics?.equation" class="mt-4 text-center p-4 bg-black/50 rounded-lg border border-white/10">
-                      <code class="text-[#EF5A24] font-technical text-lg font-bold">{{ item.physics?.equation }}</code>
+                    <div class="text-sm font-semibold text-white/95">{{ item.optional_information.physics?.primary_mechanism }}</div>
+                    <div class="text-xs text-white/60 mt-1">Mathematical Model: {{ item.optional_information.physics?.mathematical_model }}</div>
+                    <div v-if="item.optional_information.physics?.equation" class="mt-4 text-center p-4 bg-black/50 rounded-lg border border-white/10">
+                      <code class="text-[#EF5A24] font-technical text-lg font-bold">{{ item.optional_information.physics?.equation }}</code>
                     </div>
                   </UCard>
                   
-                  <UCard v-if="item.physics?.target_materials?.length" class="bg-[#0F1E36]/20 border border-white/10 shadow-sm">
+                  <UCard v-if="item.optional_information.physics?.target_materials?.length" class="bg-[#0F1E36]/20 border border-white/10 shadow-sm">
                     <template #header>
                       <div class="text-white/40 text-xs font-technical uppercase font-bold tracking-wider">Target Materials & Systems</div>
                     </template>
                     <div class="flex flex-wrap gap-2">
                       <span 
-                        v-for="mat in item.physics.target_materials" 
+                        v-for="mat in item.optional_information.physics.target_materials" 
                         :key="mat" 
                         class="text-[10px] bg-[#EF5A24]/10 text-[#EF5A24] px-2.5 py-1 rounded font-technical font-bold border border-[#EF5A24]/20 shadow-xs"
                       >
@@ -249,10 +249,10 @@
                 </div>
 
                 <!-- Case 2: Link Resources Tab -->
-                <div v-else-if="activeTab === 'links' || (Array.isArray(item[activeTab]) && item[activeTab].length && typeof item[activeTab][0] === 'object' && item[activeTab][0].url)" class="flex flex-col gap-3">
+                <div v-else-if="activeTab === 'links' || (Array.isArray(item.optional_information[activeTab]) && item.optional_information[activeTab].length && typeof item.optional_information[activeTab][0] === 'object' && item.optional_information[activeTab][0].url)" class="flex flex-col gap-3">
                   <span class="text-white/40 text-[10px] font-technical uppercase font-bold tracking-wider mb-1">Interactive Diagnostic Portals</span>
                   <a 
-                    v-for="link in item[activeTab]" 
+                    v-for="link in item.optional_information[activeTab]" 
                     :key="link.url"
                     :href="link.url"
                     target="_blank"
@@ -267,7 +267,7 @@
                 </div>
 
                 <!-- Case 3: Flat Record / Specifications Tab -->
-                <div v-else-if="typeof item[activeTab] === 'object' && !Array.isArray(item[activeTab])" class="flex flex-col gap-4">
+                <div v-else-if="typeof item.optional_information[activeTab] === 'object' && !Array.isArray(item.optional_information[activeTab])" class="flex flex-col gap-4">
                   <UCard class="bg-[#0F1E36]/30 border border-white/10 shadow-md">
                     <template #header>
                       <div class="text-white/40 text-xs font-technical uppercase font-bold tracking-wider">
@@ -275,7 +275,7 @@
                       </div>
                     </template>
                     <div class="grid grid-cols-2 gap-x-8 gap-y-4 text-xs">
-                      <template v-for="(val, key) in item[activeTab]" :key="key">
+                      <template v-for="(val, key) in item.optional_information[activeTab]" :key="key">
                         <div class="text-white/50 font-technical py-1.5 border-b border-white/5 capitalize">{{ key.replace(/_/g, ' ') }}</div>
                         <div class="text-white font-semibold py-1.5 border-b border-white/5 text-right">{{ val }}</div>
                       </template>
@@ -284,7 +284,7 @@
                 </div>
 
                 <!-- Case 4: Array of Strings / Checklist Tab -->
-                <div v-else-if="Array.isArray(item[activeTab]) && typeof item[activeTab][0] === 'string'" class="flex flex-col gap-4">
+                <div v-else-if="Array.isArray(item.optional_information[activeTab]) && typeof item.optional_information[activeTab][0] === 'string'" class="flex flex-col gap-4">
                   <UCard class="bg-[#0F1E36]/30 border border-white/10 shadow-md">
                     <template #header>
                       <div class="text-white/40 text-xs font-technical uppercase font-bold tracking-wider">
@@ -293,7 +293,7 @@
                     </template>
                     <div class="flex flex-col gap-3.5 text-xs text-white/80">
                       <div 
-                        v-for="(step, sIdx) in item[activeTab]" 
+                        v-for="(step, sIdx) in item.optional_information[activeTab]" 
                         :key="sIdx" 
                         class="flex items-start gap-3.5 py-2.5 border-b border-white/5 last:border-b-0"
                       >
@@ -308,7 +308,7 @@
 
                 <!-- Case 5: Fallback Single String/Text Tab -->
                 <div v-else class="text-xs text-white/80 leading-relaxed bg-[#0F1E36]/20 p-6 rounded-xl border border-white/5 select-text shadow-sm">
-                  {{ item[activeTab] }}
+                  {{ item.optional_information[activeTab] }}
                 </div>
               </div>
             </div>
@@ -350,11 +350,11 @@ const dynamicTabs = computed(() => {
     { key: 'overview', label: 'Overview', icon: 'i-lucide-book-open' }
   ]
   
-  if (!props.item) return tabs
+  if (!props.item || !props.item.optional_information) return tabs
   
-  // Extract custom or optional keys
-  const itemKeys = Object.keys(props.item).filter(key => {
-    return !systemKeys.includes(key) && !key.startsWith('_')
+  // Extract custom or optional keys from optional_information
+  const infoKeys = Object.keys(props.item.optional_information).filter(key => {
+    return !key.startsWith('_')
   })
   
   // Specialized icon mappings
@@ -368,7 +368,7 @@ const dynamicTabs = computed(() => {
     calibration: 'i-lucide-gauge'
   }
   
-  itemKeys.forEach(key => {
+  infoKeys.forEach(key => {
     const label = key
       .split('_')
       .map(word => word.charAt(0).toUpperCase() + word.slice(1))

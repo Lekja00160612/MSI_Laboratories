@@ -3,6 +3,7 @@ id: "embedded-arduino-kit"
 title: "IoT & Embedded Development Station"
 model: "VGU-IoT-WS1"
 manufacturer: "National Instruments / Arduino"
+category: "Electronics"
 departments:
   - "Electrical Engineering"
 location:
@@ -13,21 +14,24 @@ location:
 media:
   images:
     - "/images/equipment/arduino-exterior.png"
-  ambient_color: "#3B82F6"
-physics:
-  primary_mechanism: "Digital Circuit Prototyping"
-  mathematical_model: "Ohm's Law"
-  equation: "V = I \\cdot R"
-  target_materials:
-    - "Microcontrollers"
-    - "Sensors and Actuators"
-specifications:
-  mcu: "ATmega328P / ESP32"
-  analog_io: "6 Channels"
-  digital_io: "14 Pins"
-links:
-  - title: "VGU IoT Programming"
-    url: "https://vgu.edu.vn/iot-programming"
+  model_3d: "https://modelviewer.dev/shared-assets/models/Astronaut.glb"
+  video: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4"
+  ambient_color: "#10B981"
+optional_information:
+  physics:
+    primary_mechanism: "Digital Circuit Prototyping"
+    mathematical_model: "Ohm's Law"
+    equation: "V = I \\cdot R"
+    target_materials:
+      - "Microcontrollers"
+      - "Sensors and Actuators"
+  specifications:
+    mcu: "ATmega328P / ESP32"
+    analog_io: "6 Channels"
+    digital_io: "14 Pins"
+  links:
+    - title: "VGU IoT Programming"
+      url: "https://vgu.edu.vn/iot-programming"
 status: "operational"
 ---
 

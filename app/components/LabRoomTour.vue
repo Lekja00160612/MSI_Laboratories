@@ -18,7 +18,7 @@
       </div>
       <div class="flex items-center gap-4">
         <span class="text-xs font-technical text-[#EF5A24] uppercase font-bold tracking-widest hidden sm:block">
-          {{ room.building_id.toUpperCase() }} // FLOOR {{ room.floor }} // CELL {{ room.room_id.replace('lab-', '').replace('room-', '').toUpperCase() }}
+          {{ (room.building_id || '').toUpperCase() }} // FLOOR {{ room.floor || 1 }} // CELL {{ (room.room_id || '').replace('lab-', '').replace('room-', '').toUpperCase() }}
         </span>
         <UBadge color="warning" variant="subtle" class="font-technical uppercase text-[9px] tracking-widest px-2.5 py-1">
           CELL STATE: {{ room.status }}
@@ -170,25 +170,25 @@
         </div>
 
         <!-- Float Holographic Detail Card with dynamic tabs -->
-        <div class="z-30 max-w-xl w-full lg:w-auto mx-auto lg:mx-0 lg:ml-16 overflow-y-auto max-h-[85vh] shrink-0 my-auto">
-          <div class="vgu-panel p-5 border border-[#EF5A24]/30 shadow-2xl rounded-xl bg-[#0F1E36]/90 backdrop-blur-md flex flex-col gap-3.5 w-full">
+        <div class="z-30 max-w-xl w-full lg:w-auto mx-auto lg:mx-0 lg:ml-16 shrink-0 my-auto">
+          <div class="vgu-panel p-5 border border-[#EF5A24]/30 shadow-2xl rounded-xl bg-[#0F1E36]/90 backdrop-blur-md flex flex-col gap-3.5 w-[92vw] sm:w-[500px] h-[440px] md:h-[480px]">
             <div>
               <div class="text-[#EF5A24] text-[10px] font-technical uppercase font-bold tracking-widest leading-none">
                 INSTRUMENT PROFILE // {{ idx + 1 }} OF {{ equipment.length }}
               </div>
-              <h3 class="text-xl md:text-2xl font-extrabold text-white mt-2 leading-tight tracking-tight">{{ mach.title }}</h3>
+              <h3 class="text-lg md:text-xl font-extrabold text-white mt-1.5 md:mt-2 leading-tight tracking-tight line-clamp-2 h-12 md:h-14 flex items-center">{{ mach.title }}</h3>
               <div class="text-[10px] font-technical text-[#06B6D4] uppercase font-bold tracking-wider mt-1">
                 {{ mach.manufacturer }} // {{ mach.model }}
               </div>
             </div>
 
             <!-- Custom Cyber Tab Switcher -->
-            <div class="flex flex-wrap gap-1.5 border-b border-white/10 pb-2">
+            <div class="flex items-center gap-1.5 border-b border-white/10 pb-2 overflow-x-auto scrollbar-none flex-nowrap shrink-0 select-none">
               <button
                 v-for="tab in getDynamicTabsForMachine(mach)"
                 :key="tab.key"
                 @click="setActiveTab(mach.id, tab.key)"
-                class="px-2.5 py-1 rounded-md text-[9px] font-technical uppercase font-bold tracking-wider transition-all duration-300 flex items-center gap-1.5 border cursor-pointer select-none"
+                class="px-2.5 py-1 rounded-md text-[9px] font-technical uppercase font-bold tracking-wider transition-all duration-300 flex items-center gap-1.5 border cursor-pointer shrink-0 select-none"
                 :class="getActiveTab(mach.id) === tab.key 
                   ? 'bg-[#EF5A24]/10 border-[#EF5A24] text-white shadow-[0_0_8px_rgba(239,90,36,0.25)]' 
                   : 'bg-[#0F1E36]/40 border-white/5 text-white/50 hover:text-white hover:bg-[#0F1E36]/70 hover:border-white/10'"
@@ -202,8 +202,8 @@
               </button>
             </div>
 
-            <!-- Tab Content Area (Scrollable height-constrained) -->
-            <div class="flex-grow flex flex-col justify-start min-h-[140px] max-h-[220px] overflow-y-auto pr-1">
+            <!-- Tab Content Area (Scrollable height-constrained with fixed height) -->
+            <div class="flex-grow flex flex-col justify-start h-[190px] md:h-[220px] overflow-y-auto pr-1">
               <Transition name="fade" mode="out-in">
                 <div :key="getActiveTab(mach.id)">
                   <!-- 1. Overview Tab -->
@@ -212,11 +212,11 @@
                   </div>
 
                   <!-- 2. Dynamic Frontmatter Tabs -->
-                  <div v-else-if="mach[getActiveTab(mach.id)]" class="text-xs text-white/80 select-text">
+                  <div v-else-if="mach.optional_information?.[getActiveTab(mach.id)]" class="text-xs text-white/80 select-text">
                     <!-- Case A: Links -->
-                    <div v-if="getActiveTab(mach.id) === 'links' || (Array.isArray(mach[getActiveTab(mach.id)]) && mach[getActiveTab(mach.id)].length && typeof mach[getActiveTab(mach.id)][0] === 'object' && mach[getActiveTab(mach.id)][0].url)" class="flex flex-col gap-2">
+                    <div v-if="getActiveTab(mach.id) === 'links' || (Array.isArray(mach.optional_information[getActiveTab(mach.id)]) && mach.optional_information[getActiveTab(mach.id)].length && typeof mach.optional_information[getActiveTab(mach.id)][0] === 'object' && mach.optional_information[getActiveTab(mach.id)][0].url)" class="flex flex-col gap-2">
                       <a 
-                        v-for="link in mach[getActiveTab(mach.id)]" 
+                        v-for="link in mach.optional_information[getActiveTab(mach.id)]" 
                         :key="link.url"
                         :href="link.url"
                         target="_blank"
@@ -233,27 +233,27 @@
                       <div class="bg-black/50 p-2.5 rounded-lg border border-white/5 flex flex-col gap-1.5">
                         <div class="flex flex-col">
                           <span class="text-white/40 text-[8px] font-technical uppercase leading-none">PRIMARY MECHANISM</span>
-                          <span class="text-white font-medium text-xs mt-1">{{ mach.physics?.primary_mechanism }}</span>
+                          <span class="text-white font-medium text-xs mt-1">{{ mach.optional_information.physics?.primary_mechanism }}</span>
                         </div>
-                        <span class="text-white/50 text-[9px] mt-0.5">Model: {{ mach.physics?.mathematical_model }}</span>
-                        <div v-if="mach.physics?.equation" class="mt-2 text-center p-2.5 bg-black/70 rounded border border-white/5">
-                          <code class="text-[#EF5A24] font-technical text-sm font-bold">{{ mach.physics?.equation }}</code>
+                        <span class="text-white/50 text-[9px] mt-0.5">Model: {{ mach.optional_information.physics?.mathematical_model }}</span>
+                        <div v-if="mach.optional_information.physics?.equation" class="mt-2 text-center p-2.5 bg-black/70 rounded border border-white/5">
+                          <code class="text-[#EF5A24] font-technical text-sm font-bold">{{ mach.optional_information.physics?.equation }}</code>
                         </div>
                       </div>
                     </div>
 
                     <!-- Case C: Flat Record / Specifications -->
-                    <div v-else-if="typeof mach[getActiveTab(mach.id)] === 'object' && !Array.isArray(mach[getActiveTab(mach.id)])" class="grid grid-cols-2 gap-x-4 gap-y-2 border-t border-white/5 pt-1.5 text-[10px]">
-                      <template v-for="(val, key) in Object.entries(mach[getActiveTab(mach.id)])" :key="key">
+                    <div v-else-if="typeof mach.optional_information[getActiveTab(mach.id)] === 'object' && !Array.isArray(mach.optional_information[getActiveTab(mach.id)])" class="grid grid-cols-2 gap-x-4 gap-y-2 border-t border-white/5 pt-1.5 text-[10px]">
+                      <template v-for="(val, key) in mach.optional_information[getActiveTab(mach.id)]" :key="key">
                         <span class="text-white/40 font-technical uppercase truncate py-0.5 border-b border-white/5">{{ key.replace(/_/g, ' ') }}</span>
                         <span class="text-white font-semibold text-right truncate py-0.5 border-b border-white/5">{{ val }}</span>
                       </template>
                     </div>
 
                     <!-- Case D: Array of Strings -->
-                    <div v-else-if="Array.isArray(mach[getActiveTab(mach.id)]) && typeof mach[getActiveTab(mach.id)][0] === 'string'" class="flex flex-col gap-2">
+                    <div v-else-if="Array.isArray(mach.optional_information[getActiveTab(mach.id)]) && typeof mach.optional_information[getActiveTab(mach.id)][0] === 'string'" class="flex flex-col gap-2">
                       <div 
-                        v-for="(step, sIdx) in mach[getActiveTab(mach.id)]" 
+                        v-for="(step, sIdx) in mach.optional_information[getActiveTab(mach.id)]" 
                         :key="sIdx"
                         class="flex items-start gap-2 py-1.5 border-b border-white/5 last:border-b-0 text-[11px] leading-relaxed"
                       >
@@ -264,7 +264,7 @@
 
                     <!-- Case E: Fallback -->
                     <div v-else class="leading-relaxed bg-black/20 p-3.5 rounded border border-white/5 select-text">
-                      {{ mach[getActiveTab(mach.id)] }}
+                      {{ mach.optional_information[getActiveTab(mach.id)] }}
                     </div>
                   </div>
                 </div>
@@ -291,30 +291,34 @@
           </div>
         </div>
 
-        <!-- Slide bottom navigation controller links -->
-        <div class="absolute bottom-8 right-8 z-30 flex items-center gap-3">
-          <UButton 
-            v-if="idx < equipment.length - 1"
-            @click="scrollToNext(idx + 2)"
-            icon="i-lucide-arrow-down"
-            color="neutral"
-            variant="ghost"
-            class="font-technical text-[10px] uppercase tracking-widest text-white/40 hover:text-white hover:bg-white/5"
-          >
-            NEXT MACHINE ↓
-          </UButton>
-          <UButton 
-            v-else
-            @click="scrollToTop"
-            icon="i-lucide-arrow-up"
-            color="neutral"
-            variant="ghost"
-            class="font-technical text-[10px] uppercase tracking-widest text-white/40 hover:text-white hover:bg-white/5"
-          >
-            BACK TO TOP ↑
-          </UButton>
-        </div>
       </section>
+    </div>
+
+    <!-- Fixed Navigation controls on mobile/desktop -->
+    <div 
+      v-if="currentSlideIndex > 0 && equipment.length" 
+      class="fixed bottom-6 right-6 z-45 flex items-center gap-3"
+    >
+      <UButton 
+        v-if="currentSlideIndex < equipment.length"
+        @click="scrollToNext(currentSlideIndex + 1)"
+        icon="i-lucide-arrow-down"
+        color="neutral"
+        variant="solid"
+        class="font-technical text-[10px] uppercase tracking-widest text-white/80 hover:text-white bg-[#0F1E36]/95 hover:bg-[#EF5A24]/10 border border-[#EF5A24]/30 hover:border-[#EF5A24] px-3.5 py-2 rounded-lg shadow-xl backdrop-blur-md transition-all duration-300 pointer-events-auto"
+      >
+        NEXT MACHINE ↓
+      </UButton>
+      <UButton 
+        v-else
+        @click="scrollToTop"
+        icon="i-lucide-arrow-up"
+        color="neutral"
+        variant="solid"
+        class="font-technical text-[10px] uppercase tracking-widest text-white/80 hover:text-white bg-[#0F1E36]/95 hover:bg-[#EF5A24]/10 border border-[#EF5A24]/30 hover:border-[#EF5A24] px-3.5 py-2 rounded-lg shadow-xl backdrop-blur-md transition-all duration-300 pointer-events-auto"
+      >
+        BACK TO TOP ↑
+      </UButton>
     </div>
   </div>
 </template>
@@ -337,6 +341,7 @@ const emit = defineEmits(['close', 'select-equipment'])
 
 const scrollContainer = ref(null)
 const scrollPercent = ref(0)
+const currentSlideIndex = ref(0)
 
 const activeImageIndex = ref(0)
 const isHovering = ref(false)
@@ -347,10 +352,7 @@ const mouseY = ref(50)
 const activeTabsMap = ref({})
 
 function getActiveTab(machId) {
-  if (!activeTabsMap.value[machId]) {
-    activeTabsMap.value[machId] = 'overview'
-  }
-  return activeTabsMap.value[machId]
+  return activeTabsMap.value[machId] || 'overview'
 }
 
 function setActiveTab(machId, tabKey) {
@@ -369,10 +371,10 @@ function getDynamicTabsForMachine(mach) {
   const tabs = [
     { key: 'overview', label: 'Overview', icon: 'i-lucide-book-open' }
   ]
-  if (!mach) return tabs
+  if (!mach || !mach.optional_information) return tabs
   
-  const itemKeys = Object.keys(mach).filter(key => {
-    return !systemKeys.includes(key) && !key.startsWith('_')
+  const infoKeys = Object.keys(mach.optional_information).filter(key => {
+    return !key.startsWith('_')
   })
   
   const iconMap = {
@@ -385,7 +387,7 @@ function getDynamicTabsForMachine(mach) {
     calibration: 'i-lucide-gauge'
   }
   
-  itemKeys.forEach(key => {
+  infoKeys.forEach(key => {
     const label = key
       .split('_')
       .map(word => word.charAt(0).toUpperCase() + word.slice(1))
@@ -403,13 +405,15 @@ function getDynamicTabsForMachine(mach) {
 
 // Lab Images selection based on room department
 const labImages = computed(() => {
-  if (!props.room || !props.room.departments) {
+  if (!props.room || !props.room.departments || !Array.isArray(props.room.departments)) {
     return ['/images/labs/materials_science_lab.png', '/images/labs/electrical_engineering_lab.png']
   }
   const isEE = props.room.departments.some(d => 
-    d.toLowerCase().includes('electrical') || 
-    d.toLowerCase().includes('computer') || 
-    d.toLowerCase().includes('it')
+    d && typeof d === 'string' && (
+      d.toLowerCase().includes('electrical') || 
+      d.toLowerCase().includes('computer') || 
+      d.toLowerCase().includes('it')
+    )
   )
   if (isEE) {
     return [
@@ -431,9 +435,16 @@ function handleScroll() {
   const maxScroll = el.scrollHeight - el.clientHeight
   if (maxScroll <= 0) {
     scrollPercent.value = 0
+    currentSlideIndex.value = 0
     return
   }
   scrollPercent.value = (el.scrollTop / maxScroll) * 100
+  
+  // Calculate current active slide index
+  const slideHeight = el.clientHeight
+  if (slideHeight > 0) {
+    currentSlideIndex.value = Math.round(el.scrollTop / slideHeight)
+  }
 }
 
 // Next slide scroller
@@ -473,5 +484,13 @@ function handleMouseLeave() {
 .fade-enter-from,
 .fade-leave-to {
   opacity: 0;
+}
+
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
+}
+.scrollbar-none {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }
 </style>

@@ -123,6 +123,11 @@ for (let floor = 1; floor <= 5; floor++) {
 
       const roomNumber = cols[0].trim();
       const loopIndex = parseInt(cols[1].trim());
+
+      // Only process the main room boundary loop (loopIndex === 0)
+      // Inner structural columns/lines (loopIndex > 0) are ignored to avoid duplicate/overlapping features
+      if (loopIndex !== 0) return;
+
       const startX = parseFloat(cols[3].trim());
       const startY = parseFloat(cols[4].trim());
       const endX = parseFloat(cols[5].trim());
@@ -132,7 +137,16 @@ for (let floor = 1; floor <= 5; floor++) {
       if (!roomSegments[key]) {
         roomSegments[key] = [];
       }
-      roomSegments[key].push({ startX, startY, endX, endY });
+
+      // Avoid adding duplicate segments (or reversed segments) due to CAD double-layer exports
+      const isDuplicate = roomSegments[key].some(seg => 
+        (Math.abs(seg.startX - startX) < 1.0 && Math.abs(seg.startY - startY) < 1.0 && Math.abs(seg.endX - endX) < 1.0 && Math.abs(seg.endY - endY) < 1.0) ||
+        (Math.abs(seg.startX - endX) < 1.0 && Math.abs(seg.startY - endY) < 1.0 && Math.abs(seg.endX - startX) < 1.0 && Math.abs(seg.endY - startY) < 1.0)
+      );
+
+      if (!isDuplicate) {
+        roomSegments[key].push({ startX, startY, endX, endY });
+      }
     });
 
     // Solve and reconstruct polygons for each room/loop

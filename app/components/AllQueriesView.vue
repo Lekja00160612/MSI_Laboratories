@@ -3,33 +3,68 @@
     <!-- Header -->
     <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-white/10 pb-4 shrink-0">
       <div>
-        <h2 class="text-3xl font-extrabold text-white tracking-tight">MSI Scientific Equipment Repository</h2>
-        <p class="text-sm text-white/50 mt-1">Search and filter across all VGU Materials Science laboratories</p>
+        <h2 class="text-xl md:text-3xl font-extrabold text-white tracking-tight">MSI Scientific Equipment Repository</h2>
+        <p class="text-xs md:text-sm text-white/50 mt-1">Search and filter across all VGU Materials Science laboratories</p>
       </div>
-      <button 
-        @click="emit('back-to-map')" 
-        class="flex items-center gap-2 px-4 py-2 rounded-lg bg-[#0F1E36] hover:bg-[#EF5A24]/10 border border-[#EF5A24]/30 hover:border-[#EF5A24] text-sm text-[#EF5A24] hover:text-white transition-all duration-300 font-technical"
-      >
-        ← INTERACTIVE CAMPUS MAP
-      </button>
+      <div class="flex items-center gap-2 w-full md:w-auto">
+        <!-- Mobile Filters Toggle Button -->
+        <button 
+          @click="showMobileFilters = true" 
+          class="flex md:hidden items-center justify-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#0F1E36] hover:bg-[#EF5A24]/10 border border-[#EF5A24]/30 hover:border-[#EF5A24] text-xs text-[#EF5A24] hover:text-white transition-all duration-300 font-technical flex-1"
+        >
+          <UIcon name="i-lucide-sliders-horizontal" class="w-3.5 h-3.5" />
+          FILTERS
+        </button>
+
+        <!-- Back to Map Button -->
+        <button 
+          @click="emit('back-to-map')" 
+          class="flex items-center justify-center gap-2 px-3 md:px-4 py-1.5 md:py-2 rounded-lg bg-[#0F1E36] hover:bg-[#EF5A24]/10 border border-[#EF5A24]/30 hover:border-[#EF5A24] text-xs md:text-sm text-[#EF5A24] hover:text-white transition-all duration-300 font-technical flex-1 md:flex-initial"
+        >
+          <span class="md:hidden">← MAP</span>
+          <span class="hidden md:inline">← INTERACTIVE CAMPUS MAP</span>
+        </button>
+      </div>
     </div>
 
     <!-- Main Content Area: Split into Left Sidebar and Right Grid -->
-    <div class="flex-grow flex gap-6 overflow-hidden">
+    <div class="flex-grow flex gap-6 overflow-hidden relative">
+      <!-- Backdrop for mobile filter drawer -->
+      <div 
+        v-if="showMobileFilters" 
+        class="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 md:hidden"
+        @click="showMobileFilters = false"
+      ></div>
+
       <!-- Left-hand vertical filter sidebar -->
-      <aside class="w-80 shrink-0 flex flex-col gap-6 bg-[#0F1E36] border border-white/10 p-5 rounded-xl overflow-y-auto shadow-2xl">
+      <aside 
+        :class="[
+          'fixed inset-y-0 left-0 z-50 w-80 max-w-[80vw] flex flex-col gap-6 bg-[#0F1E36] p-5 overflow-y-auto shadow-2xl transition-transform duration-300 ease-out',
+          'md:static md:z-auto md:w-80 md:max-w-none md:translate-x-0 md:border md:border-white/10 md:rounded-xl md:shadow-none',
+          showMobileFilters ? 'translate-x-0' : '-translate-x-full md:translate-x-0'
+        ]"
+      >
         <div class="flex items-center justify-between border-b border-white/5 pb-3">
           <span class="font-technical font-bold text-xs text-[#EF5A24] tracking-widest uppercase">FILTER CONTROLS</span>
-          <UButton 
-            v-if="hasActiveFilters" 
-            color="neutral" 
-            variant="ghost" 
-            size="xs" 
-            @click="clearFilters"
-            class="text-[10px] font-technical uppercase font-bold text-white/40 hover:text-white hover:bg-white/5"
-          >
-            Clear All
-          </UButton>
+          <div class="flex items-center gap-2">
+            <UButton 
+              v-if="hasActiveFilters" 
+              color="neutral" 
+              variant="ghost" 
+              size="xs" 
+              @click="clearFilters"
+              class="text-[10px] font-technical uppercase font-bold text-white/40 hover:text-white hover:bg-white/5"
+            >
+              Clear All
+            </UButton>
+            <!-- Mobile Close Button -->
+            <button 
+              @click="showMobileFilters = false" 
+              class="md:hidden text-white/60 hover:text-white p-1 hover:bg-white/5 rounded transition-colors flex items-center justify-center"
+            >
+              <UIcon name="i-lucide-x" class="w-5 h-5" />
+            </button>
+          </div>
         </div>
 
         <!-- Search Input -->
@@ -43,6 +78,7 @@
             color="neutral"
             variant="outline"
             size="md"
+            :ui="{ base: 'ps-8', leading: 'pointer-events-none absolute inset-y-0 start-0 flex items-center justify-center ps-2.5', leadingIcon: 'w-4 h-4 text-white/40' }"
             class="w-full"
           />
         </div>
@@ -124,6 +160,7 @@
                   color="neutral"
                   variant="outline"
                   icon="i-lucide-search"
+                  :ui="{ base: 'ps-7', leading: 'pointer-events-none absolute inset-y-0 start-0 flex items-center justify-center ps-2', leadingIcon: 'w-3.5 h-3.5 text-white/40' }"
                   class="mb-2 w-full"
                 />
                 <div class="flex flex-col gap-2.5 max-h-48 overflow-y-auto pr-1">
@@ -151,10 +188,13 @@
         </div>
 
         <!-- Cards Container -->
-        <div class="flex-grow overflow-y-auto pr-1">
-          <div v-if="filteredEquipment.length" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+        <div 
+          @scroll="handleGridScroll" 
+          class="flex-grow overflow-y-auto pr-1"
+        >
+          <div v-if="filteredEquipment.length" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 pb-6">
             <div 
-              v-for="item in filteredEquipment" 
+              v-for="item in paginatedEquipment" 
               :key="item.id"
               class="vgu-panel rounded-xl overflow-hidden hover:vgu-panel-active border border-white/5 hover:border-[#EF5A24]/40 flex flex-col h-[380px] group transition-all duration-300"
             >
@@ -214,6 +254,15 @@
                 </div>
               </div>
             </div>
+
+            <!-- Infinite Scroll indicator -->
+            <div 
+              v-if="displayLimit < filteredEquipment.length" 
+              class="col-span-full py-6 flex flex-col items-center justify-center gap-2 text-white/40"
+            >
+              <UIcon name="i-lucide-loader-circle" class="w-6 h-6 animate-spin text-[#EF5A24]" />
+              <span class="text-[10px] font-technical uppercase tracking-wider">LOADING MORE INSTRUMENTS...</span>
+            </div>
           </div>
 
           <!-- Empty State -->
@@ -228,7 +277,7 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, watch } from 'vue'
 
 const props = defineProps({
   items: {
@@ -249,6 +298,23 @@ const roomSearchQuery = ref('')
 const collapseDept = ref(true)
 const collapseCat = ref(true)
 const collapseRoom = ref(true)
+
+const showMobileFilters = ref(false)
+const displayLimit = ref(6)
+
+// Reset display limit when filters change
+watch([searchQuery, selectedDepartments, selectedCategories, selectedRooms], () => {
+  displayLimit.value = 6
+})
+
+function handleGridScroll(e) {
+  const container = e.target
+  if (container.scrollTop + container.clientHeight >= container.scrollHeight - 100) {
+    if (displayLimit.value < filteredEquipment.value.length) {
+      displayLimit.value += 6
+    }
+  }
+}
 
 // Active filter state check
 const hasActiveFilters = computed(() => {
@@ -367,5 +433,9 @@ const filteredEquipment = computed(() => {
 
     return matchSearch && matchDept && matchCat && matchRoom
   })
+})
+
+const paginatedEquipment = computed(() => {
+  return filteredEquipment.value.slice(0, displayLimit.value)
 })
 </script>

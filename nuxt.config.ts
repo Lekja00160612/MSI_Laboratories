@@ -6,6 +6,21 @@ export default defineNuxtConfig({
 
   app: {
     head: {
+      link: [
+        {
+          rel: 'preconnect',
+          href: 'https://fonts.googleapis.com'
+        },
+        {
+          rel: 'preconnect',
+          href: 'https://fonts.gstatic.com',
+          crossorigin: 'anonymous'
+        },
+        {
+          rel: 'stylesheet',
+          href: 'https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700;800&family=Space+Mono:wght@400;700&family=Inter:wght@300;400;500;600;700;800&display=swap'
+        }
+      ],
       script: [
         {
           type: 'module',
@@ -56,12 +71,13 @@ export default defineNuxtConfig({
   },
 
   css: [
+    'maplibre-gl/dist/maplibre-gl.css',
     '~/assets/css/main.css'
   ],
 
   pwa: {
-    // 1. Inject manifest directly via Nitro route rules for edge deployments
-    registerWebManifestInRouteRules: true,
+    // 1. Serve PWA manifest statically for Cloudflare Pages static hosting compatibility
+    registerWebManifestInRouteRules: false,
 
     registerType: 'autoUpdate',
     manifest: {

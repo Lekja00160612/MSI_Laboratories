@@ -3,6 +3,7 @@ id: "furnace-carbolite"
 title: "High-Temperature Tube Furnace"
 model: "HST 12/600"
 manufacturer: "Carbolite Gero"
+category: "Thermal Processing"
 departments:
   - "Materials Science and Engineering"
   - "Chemical Engineering"
@@ -16,20 +17,21 @@ media:
     - "/images/equipment/furnace-exterior.png"
   internal_blueprint: "/images/equipment/furnace-schematic.svg"
   ambient_color: "#EF5A24"
-physics:
-  primary_mechanism: "Radiative and Convective Heating"
-  mathematical_model: "Stefan-Boltzmann Law"
-  equation: "P = \\epsilon \\sigma A T^4"
-  target_materials:
-    - "Alloy ingots for sintering"
-    - "Glass substrates"
-specifications:
-  max_temperature: "1200 °C"
-  heated_length: "600 mm"
-  atmosphere_control: "Vacuum / Inert Gas (Ar, N2)"
-links:
-  - title: "High Temp Thermal Treatments Info"
-    url: "https://vgu.edu.vn/furnace-safety"
+optional_information:
+  physics:
+    primary_mechanism: "Radiative and Convective Heating"
+    mathematical_model: "Stefan-Boltzmann Law"
+    equation: "P = \\epsilon \\sigma A T^4"
+    target_materials:
+      - "Alloy ingots for sintering"
+      - "Glass substrates"
+  specifications:
+    max_temperature: "1200 °C"
+    heated_length: "600 mm"
+    atmosphere_control: "Vacuum / Inert Gas (Ar, N2)"
+  links:
+    - title: "High Temp Thermal Treatments Info"
+      url: "https://vgu.edu.vn/furnace-safety"
 status: "operational"
 ---
 

@@ -3,6 +3,7 @@ id: "cnc-haas-vf2"
 title: "CNC Vertical Machining Center"
 model: "Haas VF-2"
 manufacturer: "Haas Automation"
+category: "Machining"
 departments:
   - "Mechanical Engineering"
 location:
@@ -14,20 +15,21 @@ media:
   images:
     - "/images/equipment/cnc-exterior.png"
   ambient_color: "#34D399"
-physics:
-  primary_mechanism: "Rotary Chip Removal Cutting"
-  mathematical_model: "Cutting Speed Relation"
-  equation: "V_c = \\frac{\\pi \\cdot d \\cdot n}{1000}"
-  target_materials:
-    - "Aluminium 6061"
-    - "Medium Carbon Steel"
-specifications:
-  spindle_speed: "8100 rpm"
-  axis_travel_x_y_z: "762 x 406 x 508 mm"
-  motor_power: "30 hp"
-links:
-  - title: "CNC Machining Protocol"
-    url: "https://vgu.edu.vn/cnc-guide"
+optional_information:
+  physics:
+    primary_mechanism: "Rotary Chip Removal Cutting"
+    mathematical_model: "Cutting Speed Relation"
+    equation: "V_c = \\frac{\\pi \\cdot d \\cdot n}{1000}"
+    target_materials:
+      - "Aluminium 6061"
+      - "Medium Carbon Steel"
+  specifications:
+    spindle_speed: "8100 rpm"
+    axis_travel_x_y_z: "762 x 406 x 508 mm"
+    motor_power: "30 hp"
+  links:
+    - title: "CNC Machining Protocol"
+      url: "https://vgu.edu.vn/cnc-guide"
 status: "operational"
 ---
 

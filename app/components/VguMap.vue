@@ -10,37 +10,37 @@
     ></div>
 
     <!-- Unified Top Context HUD Bar -->
-    <div class="absolute top-6 left-1/2 -translate-x-1/2 z-20 w-[90%] max-w-xl pointer-events-none">
-      <div class="vgu-panel px-5 py-2.5 rounded-lg text-xs font-technical flex items-center justify-between border border-[#EF5A24]/30 shadow-lg bg-[#0F1E36]/90 backdrop-blur-md">
-        <div class="flex items-center gap-2">
-          <span class="w-2 h-2 rounded-full bg-[#EF5A24] animate-pulse"></span>
-          <span class="text-[#EF5A24] font-bold uppercase tracking-wider">
+    <div class="absolute top-4 sm:top-6 left-1/2 -translate-x-1/2 z-20 w-[92%] sm:w-[90%] max-w-xl pointer-events-none">
+      <div class="vgu-panel px-3 py-2 sm:px-5 sm:py-2.5 rounded-lg text-[10px] sm:text-xs font-technical flex items-center justify-between border border-[#EF5A24]/30 shadow-lg bg-[#0F1E36]/90 backdrop-blur-md">
+        <div class="flex items-center gap-1.5 sm:gap-2">
+          <span class="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-[#EF5A24] animate-pulse"></span>
+          <span class="text-[#EF5A24] font-bold uppercase tracking-wider line-clamp-1">
             {{ hudContextTitle }}
           </span>
         </div>
-        <div class="text-[#06B6D4] font-semibold text-[9px] uppercase tracking-widest hidden sm:block">
+        <div class="text-[#06B6D4] font-semibold text-[8px] sm:text-[9px] uppercase tracking-widest hidden sm:block">
           {{ hudContextGuidance }}
         </div>
       </div>
     </div>
 
     <!-- Map Overlay Controls -->
-    <div class="absolute bottom-6 left-6 z-20 flex flex-col gap-2">
-      <div class="vgu-panel px-4 py-2 rounded-lg text-xs font-technical flex flex-col gap-1">
-        <div class="text-[#EF5A24] font-bold">VGU MSI HOLOGRAPHIC MAP</div>
+    <div class="absolute bottom-4 left-4 sm:bottom-6 sm:left-6 z-20 flex flex-col gap-2">
+      <div class="vgu-panel px-2.5 py-1.5 sm:px-4 sm:py-2 rounded-lg text-[9px] sm:text-xs font-technical flex flex-col gap-0.5 sm:gap-1">
+        <div class="text-[#EF5A24] font-bold text-[10px] sm:text-xs">VGU MSI HOLOGRAPHIC MAP</div>
         <div class="text-white/60">LAT: {{ mapCenter[1].toFixed(4) }} | LON: {{ mapCenter[0].toFixed(4) }}</div>
         <div class="text-white/60">ZOOM: {{ zoomLevel.toFixed(1) }} | PITCH: {{ pitchLevel }}°</div>
       </div>
     </div>
 
     <!-- Left Hand Elevator UI (Floors) -->
-    <div v-if="selectedBuilding" class="absolute left-6 top-1/2 -translate-y-1/2 z-20 flex flex-col gap-2 bg-[#0F1E36]/90 backdrop-blur-md border border-[#EF5A24]/30 p-2 rounded-full shadow-lg">
+    <div v-if="selectedBuilding" class="absolute left-4 sm:left-6 top-1/2 -translate-y-1/2 z-20 flex flex-col gap-1.5 sm:gap-2 bg-[#0F1E36]/90 backdrop-blur-md border border-[#EF5A24]/30 p-1.5 sm:p-2 rounded-full shadow-lg">
       <button 
         v-for="floorNum in floors" 
         :key="floorNum" 
         @click="selectFloor(floorNum)"
         :class="[
-          'w-10 h-10 rounded-full flex items-center justify-center text-xs font-technical font-bold border transition-all duration-300',
+          'w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center text-[10px] sm:text-xs font-technical font-bold border transition-all duration-300',
           selectedFloor === floorNum 
             ? 'bg-[#EF5A24] border-[#EF5A24] text-white shadow-[0_0_10px_#EF5A24]' 
             : floorsWithLabs.has(floorNum)
@@ -52,7 +52,7 @@
       </button>
       <button 
         @click="resetMap" 
-        class="w-10 h-10 rounded-full flex items-center justify-center text-xs border border-[#EF5A24]/20 text-[#EF5A24] hover:bg-[#EF5A24]/10 transition-all duration-300"
+        class="w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center text-[10px] sm:text-xs border border-[#EF5A24]/20 text-[#EF5A24] hover:bg-[#EF5A24]/10 transition-all duration-300"
         title="Exit Building"
       >
         ✕
@@ -418,9 +418,9 @@ function renderClusterLabels() {
       
       <!-- Cluster Card (positioned relative to the dot, 0x0 offset layout) -->
       <div class="cluster-marker-card absolute top-4 left-1/2 -translate-x-1/2 px-3.5 py-2 rounded bg-[#0F1E36]/95 border border-[#06B6D4]/30 hover:border-[#EF5A24] text-white shadow-xl backdrop-blur-md transition-all duration-300 hover:scale-105 text-center min-w-[140px] pointer-events-auto">
-        <div class="text-[10px] font-technical font-extrabold text-[#EF5A24] uppercase tracking-wider">${c.label}</div>
-        <div class="text-[8px] text-white/60 font-sans mt-0.5 leading-tight">${c.name}</div>
-        <div class="text-[8px] font-technical text-[#06B6D4] mt-1.5 uppercase font-bold tracking-widest animate-pulse">ENTER BLOCK →</div>
+        <div class="cluster-title text-[10px] font-technical font-extrabold text-[#EF5A24] uppercase tracking-wider">${c.label}</div>
+        <div class="cluster-subtitle text-[8px] text-white/60 font-sans mt-0.5 leading-tight">${c.name}</div>
+        <div class="cluster-action text-[8px] font-technical text-[#06B6D4] mt-1.5 uppercase font-bold tracking-widest animate-pulse">ENTER BLOCK →</div>
       </div>
     `
 
@@ -507,9 +507,9 @@ async function loadFloorplan(floorNum) {
             <span class="relative inline-flex rounded-full h-2 w-2 bg-[#EF5A24] shadow-[0_0_6px_#EF5A24]"></span>
           </div>
           <!-- Label Tag (positioned below the dot, 0x0 offset layout) -->
-          <div class="absolute top-4 left-1/2 -translate-x-1/2 px-3 py-1.5 rounded bg-[#0F1E36]/95 border border-[#EF5A24]/30 hover:border-[#EF5A24] text-white shadow-lg backdrop-blur-sm transition-all duration-300 hover:scale-105 text-center min-w-[120px] max-w-[155px] pointer-events-auto">
-            <div class="text-[10px] font-technical font-extrabold text-[#EF5A24] uppercase tracking-wider">${roomId}</div>
-            <div class="text-[9px] text-white/80 font-sans leading-tight mt-0.5 line-clamp-2">${roomName}</div>
+          <div class="room-marker-card absolute top-4 left-1/2 -translate-x-1/2 px-3 py-1.5 rounded bg-[#0F1E36]/95 border border-[#EF5A24]/30 hover:border-[#EF5A24] text-white shadow-lg backdrop-blur-sm transition-all duration-300 hover:scale-105 text-center min-w-[120px] max-w-[155px] pointer-events-auto">
+            <div class="room-title text-[10px] font-technical font-extrabold text-[#EF5A24] uppercase tracking-wider">${roomId}</div>
+            <div class="room-subtitle text-[9px] text-white/80 font-sans leading-tight mt-0.5 line-clamp-2">${roomName}</div>
           </div>
         `
 
@@ -636,5 +636,36 @@ function resetMap() {
 
 :deep(.map-zoomed-in) .cluster-marker-card {
   display: none !important;
+}
+
+@media (max-width: 768px) {
+  :deep(.cluster-marker-card) {
+    min-width: 110px !important;
+    padding: 6px 8px !important;
+  }
+  :deep(.cluster-title) {
+    font-size: 8px !important;
+  }
+  :deep(.cluster-subtitle) {
+    font-size: 7px !important;
+    margin-top: 1px !important;
+  }
+  :deep(.cluster-action) {
+    font-size: 7px !important;
+    margin-top: 4px !important;
+  }
+  :deep(.room-marker-card) {
+    min-width: 95px !important;
+    max-width: 125px !important;
+    padding: 4px 6px !important;
+  }
+  :deep(.room-title) {
+    font-size: 8px !important;
+  }
+  :deep(.room-subtitle) {
+    font-size: 7px !important;
+    margin-top: 1px !important;
+    -webkit-line-clamp: 1 !important;
+  }
 }
 </style>

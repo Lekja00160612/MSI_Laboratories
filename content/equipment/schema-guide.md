@@ -25,59 +25,64 @@ These fields must be populated in every equipment file. Omitting them will cause
 | `manufacturer` | String | The brand or manufacturer (e.g., `Agilent Technologies`). |
 | `departments` | Array of strings | List of academic divisions hosting the equipment (e.g., `["Chemistry", "Applied Physics"]`). |
 | `location` | Object | Sub-fields: `building_id` (e.g. `cluster-1`), `floor` (Integer), `room_id` (e.g. `b1-103`), `station_id` (e.g. `station-ch-1`). |
-| `media` | Object | Sub-fields: `images` (Array of absolute image paths starting with `/images/equipment/`), `internal_blueprint` (Optional: vector overlay svg path), `ambient_color` (Optional HEX color). |
+| `media` | Object | Interactive media elements. Sub-fields: `images` (Array of absolute image or video paths), `model_3d` (Optional: path to interactive 3D model glTF/GLB file), `video` (Optional: path to standalone video file), `internal_blueprint` (Optional: vector overlay SVG schematic path), `ambient_color` (Optional HEX color). |
 | `status` | String | The system status (typically `operational` or `maintenance`). |
 
 ---
 
 ## 3. Optional & Custom Fields (Automatic UI Tabs)
 
-Any other key defined in the frontmatter that is **not** in the required list will automatically generate a tab in the browser details. The UI formats the tab content dynamically based on the YAML data structure.
+Lab engineers have complete freedom to customize their machine contents. Any custom key defined under the `optional_information` block in the frontmatter will **automatically generate a dedicated tab** in the interactive browser details. You can add as many fields as you need (e.g. `safety`, `procedures`, `maintenance`, `calibration`, `diagnostics`, `operational_history`, etc.). The UI formats the tab content dynamically based on the YAML data structure.
 
 ### Supported Data Types & UI Renderings
 
 #### A. Special Objects (e.g. `physics`)
-If the field is named `physics`, the UI formats it as a dedicated scientific card:
+If the field is named `physics` inside `optional_information`, the UI formats it as a dedicated scientific card:
 ```yaml
-physics:
-  primary_mechanism: "High Pressure Liquid Phase Separation"
-  mathematical_model: "Van Deemter Equation"
-  equation: "H = A + \\frac{B}{u} + C \\cdot u"
-  target_materials:
-    - "Organic solvent mixtures"
-    - "Polymer solutions"
+optional_information:
+  physics:
+    primary_mechanism: "High Pressure Liquid Phase Separation"
+    mathematical_model: "Van Deemter Equation"
+    equation: "H = A + \\frac{B}{u} + C \\cdot u"
+    target_materials:
+      - "Organic solvent mixtures"
+      - "Polymer solutions"
 ```
 * **LaTeX Math Equations:** Backslashes inside double-quoted YAML strings **must** be escaped with double backslashes (e.g., `\\frac` instead of `\frac`, `\\nu` instead of `\nu`). Otherwise, they parse incorrectly as control characters (e.g., Form Feed or Newline).
 
 #### B. Array of Links (e.g. `links` or custom links)
-If the field is an array of objects containing `title` and `url`, the UI renders them as clickable cyberpunk action buttons:
+If the field is an array of objects containing `title` and `url` inside `optional_information`, the UI renders them as clickable cyberpunk action buttons:
 ```yaml
-links:
-  - title: "Agilent 1260 Protocol Bookings"
-    url: "https://booking.vgu.edu.vn/xrd"
+optional_information:
+  links:
+    - title: "Agilent 1260 Protocol Bookings"
+      url: "https://booking.vgu.edu.vn/xrd"
 ```
 
 #### C. Key-Value Records (e.g. `specifications` or custom records)
-If the field is a record map, the UI renders it as a structured technical grid:
+If the field is a record map inside `optional_information`, the UI renders it as a structured technical grid:
 ```yaml
-specifications:
-  pressure_range: "Up to 600 bar"
-  flow_range: "0.05 to 5.0 mL/min"
-  detector: "Diode Array Detector (DAD)"
+optional_information:
+  specifications:
+    pressure_range: "Up to 600 bar"
+    flow_range: "0.05 to 5.0 mL/min"
+    detector: "Diode Array Detector (DAD)"
 ```
 
 #### D. Array of Strings (e.g. `safety`, `procedures` or custom steps)
-If the field is a list of strings, the UI renders it as a numbered operational checklist:
+If the field is a list of strings inside `optional_information`, the UI renders it as a numbered operational checklist:
 ```yaml
-procedures:
-  - "Flush column with clean mobile phase prior to injection."
-  - "Degas solvents to prevent bubble traps in pumps."
+optional_information:
+  procedures:
+    - "Flush column with clean mobile phase prior to injection."
+    - "Degas solvents to prevent bubble traps in pumps."
 ```
 
 #### E. Plain String
-If the field is a flat string, the UI renders it as a styled paragraph:
+If the field is a flat string inside `optional_information`, the UI renders it as a styled paragraph:
 ```yaml
-maintenance: "Last inspected on June 12, 2026. Recalibration scheduled in 30 days."
+optional_information:
+  maintenance: "Last inspected on June 12, 2026. Recalibration scheduled in 30 days."
 ```
 
 ---
@@ -102,35 +107,39 @@ location:
 media:
   images:
     - "/images/equipment/furnace-exterior.png"
+  video: "/images/equipment/furnace-process.mp4"
+  model_3d: "/3d/furnace.glb"
   internal_blueprint: "/images/equipment/furnace-schematic.svg"
   ambient_color: "#EF5A24"
 status: "operational"
 
-# 1. Physics Tab (Object)
-physics:
-  primary_mechanism: "Laser Beam Deflection"
-  mathematical_model: "Einstein Wave Equation"
-  equation: "E = h\\nu"
-  target_materials:
-    - "Semiconductors"
+# All custom/optional fields must be grouped under optional_information
+optional_information:
+  # 1. Physics Tab (Object)
+  physics:
+    primary_mechanism: "Laser Beam Deflection"
+    mathematical_model: "Einstein Wave Equation"
+    equation: "E = h\\nu"
+    target_materials:
+      - "Semiconductors"
 
-# 2. Specifications Tab (Record)
-specifications:
-  wavelength: "532 nm"
-  output_power: "5 mW"
+  # 2. Specifications Tab (Record)
+  specifications:
+    wavelength: "532 nm"
+    output_power: "5 mW"
 
-# 3. Links Tab (Array of Links)
-links:
-  - title: "VGU Booking Guide"
-    url: "https://booking.vgu.edu.vn"
+  # 3. Links Tab (Array of Links)
+  links:
+    - title: "VGU Booking Guide"
+      url: "https://booking.vgu.edu.vn"
 
-# 4. Procedures Tab (Array of Strings)
-procedures:
-  - "Verify optical alignments at low power."
-  - "Activate nitrogen purge valve."
+  # 4. Procedures Tab (Array of Strings)
+  procedures:
+    - "Verify optical alignments at low power."
+    - "Activate nitrogen purge valve."
 
-# 5. Maintenance Tab (Plain String)
-maintenance: "Yearly optical bench alignment calibration required."
+  # 5. Maintenance Tab (Plain String)
+  maintenance: "Yearly optical bench alignment calibration required."
 ---
 
 ::equipment-story
