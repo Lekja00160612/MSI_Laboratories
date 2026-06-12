@@ -174,9 +174,9 @@ export default defineNuxtConfig({
   },
 
   image: {
-    // In production (Cloudflare), use the native cloudflare provider to delegate optimization to Cloudflare edge;
-    // in development (local), fall back to the default ipx (sharp).
-    provider: process.env.NODE_ENV === 'production' ? 'cloudflare' : 'ipx'
+    // Use 'ipx' in all environments to support static image prerendering at build/generation time.
+    // This enables image optimization on Cloudflare Pages free tier without paid Cloudflare resizing.
+    provider: 'ipx'
   },
 
   nitro: {

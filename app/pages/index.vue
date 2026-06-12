@@ -156,6 +156,7 @@
           <VguMap 
             :selected-building="selectedBuilding"
             :selected-floor="selectedFloor"
+            :selected-room-id="selectedRoomId"
             @select-building="selectBuilding"
             @select-floor="selectFloor"
             @select-room="selectRoom"

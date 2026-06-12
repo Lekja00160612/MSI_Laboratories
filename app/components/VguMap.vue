@@ -99,6 +99,10 @@ const props = defineProps({
   selectedFloor: {
     type: Number,
     default: null
+  },
+  selectedRoomId: {
+    type: String,
+    default: null
   }
 })
 
@@ -107,6 +111,7 @@ const emit = defineEmits(['select-building', 'select-floor', 'select-room', 'res
 const mapContainer = ref(null)
 let map = null
 const mapLoaded = ref(false)
+const currentFloorGeojson = ref(null)
 
 const config = useRuntimeConfig()
 const displayOnlyRoomsWithMachines = computed(() => config.public.displayOnlyRoomsWithMachines)
@@ -476,6 +481,8 @@ async function loadFloorplan(floorNum) {
       map.setLayoutProperty('vgu-rooms-outline', 'visibility', 'visible')
     }
 
+    currentFloorGeojson.value = data
+
     // Clear previous room markers
     clearRoomMarkers()
 
@@ -526,10 +533,50 @@ async function loadFloorplan(floorNum) {
         roomMarkers.push(marker)
       })
     }
+
+    if (props.selectedRoomId) {
+      setTimeout(() => {
+        zoomToRoom(props.selectedRoomId)
+      }, 300)
+    }
   } catch (err) {
     console.error('Failed to load floorplan data', err)
   }
 }
+
+function zoomToRoom(roomId) {
+  if (!map || !mapLoaded.value || !roomId || !currentFloorGeojson.value) return
+  const roomFeature = currentFloorGeojson.value.features.find(f => f.properties.room_id === roomId)
+  if (roomFeature && roomFeature.geometry && roomFeature.geometry.coordinates) {
+    const centroid = getPolygonCentroid(roomFeature.geometry.coordinates)
+    map.flyTo({
+      center: centroid,
+      zoom: 20.8,
+      pitch: 30,
+      bearing: 10,
+      duration: 1200
+    })
+  }
+}
+
+// Watch room selection changes to automatically zoom into/out of rooms
+watch(() => props.selectedRoomId, (newRoomId) => {
+  if (newRoomId) {
+    zoomToRoom(newRoomId)
+  } else {
+    // If deselected, restore building cluster view
+    if (props.selectedBuilding) {
+      const coords = buildingCenters[props.selectedBuilding] || [106.6155, 11.1083]
+      map.flyTo({
+        center: coords,
+        zoom: 19.5,
+        pitch: 0,
+        bearing: 0,
+        duration: 1000
+      })
+    }
+  }
+})
 
 // Watch building selection and floor changes in sync to zoom and load floorplans
 watch([() => props.selectedBuilding, () => props.selectedFloor], async ([newBuilding, newFloor], [oldBuilding, oldFloor]) => {
