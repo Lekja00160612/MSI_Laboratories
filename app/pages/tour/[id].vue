@@ -50,9 +50,7 @@ useSeoMeta({
 })
 
 function goBack() {
-  if (window.history.state && window.history.state.back) {
-    router.back()
-  } else if (room.value) {
+  if (room.value) {
     router.push(`/?building=${room.value.building_id}&floor=${room.value.floor}&room=${room.value.room_id}`)
   } else {
     router.push('/')

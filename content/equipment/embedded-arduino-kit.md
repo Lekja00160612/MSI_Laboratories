@@ -14,7 +14,12 @@ location:
 media:
   images:
     - "/images/equipment/arduino-exterior.png"
-  model_3d: "https://modelviewer.dev/shared-assets/models/Astronaut.glb"
+  model_3d:
+    src: "https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/BoomBox/glTF-Binary/BoomBox.glb"
+    title: "Diagnostic: IoT Breadboard Model"
+    position: 10
+    render_mode: "hologram"
+    auto_rotate: false
   video: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4"
   ambient_color: "#10B981"
 optional_information:

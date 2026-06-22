@@ -1,7 +1,12 @@
 <template>
   <div class="relative w-screen h-screen bg-[#070A12] text-white flex flex-col overflow-hidden font-sans">
     <!-- Navbar / Cyber HUD Bar -->
-    <header class="h-16 border-b border-[#EF5A24]/20 bg-[#0F1E36]/80 backdrop-blur-md px-6 flex items-center justify-between z-30 shrink-0">
+    <header 
+      :class="[
+        'h-16 border-b border-[#EF5A24]/20 bg-[#0F1E36]/80 backdrop-blur-md px-6 flex items-center justify-between z-30 shrink-0 transition-all duration-300',
+        isMapFullscreen ? 'hidden md:flex' : 'flex'
+      ]"
+    >
       <div class="flex items-center gap-3">
         <!-- VGU Branded Badge -->
         <div class="bg-[#EF5A24] text-white px-3 py-1 rounded-md text-sm font-technical font-extrabold uppercase tracking-wider shadow-[0_0_10px_#EF5A24]">
@@ -37,7 +42,7 @@
         <aside 
           :class="[
             'w-full md:w-80 border-b md:border-b-0 md:border-r border-white/10 bg-[#070A12]/95 z-20 shrink-0 flex flex-col transition-all duration-300',
-            isMapFullscreen ? 'h-12 overflow-hidden' : 'h-1/3 md:h-full'
+            isMapFullscreen ? 'h-0 overflow-hidden md:h-full border-b-0' : 'h-1/3 md:h-full'
           ]"
         >
           <!-- Single Line Header Mode (Fullscreen mobile map) -->
@@ -143,11 +148,14 @@
         </aside>
 
         <!-- Interactive Map Canvas -->
-        <div :class="['flex-grow relative z-10 transition-all duration-300', isMapFullscreen ? 'h-[calc(100%-3rem)]' : 'h-2/3 md:h-full']">
+        <div :class="['flex-grow relative z-10 transition-all duration-300', isMapFullscreen ? 'h-full w-full' : 'h-2/3 md:h-full w-full']">
           <!-- Floating Fullscreen Toggle Button on Mobile -->
           <button 
             @click="isMapFullscreen = !isMapFullscreen" 
-            class="md:hidden absolute top-16 sm:top-20 right-4 z-30 flex items-center justify-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-[#0F1E36]/90 hover:bg-[#EF5A24]/10 border border-[#EF5A24]/30 hover:border-[#EF5A24] text-[10px] text-[#EF5A24] hover:text-white transition-all duration-300 font-technical shadow-lg backdrop-blur-md"
+            :class="[
+              'md:hidden absolute z-30 flex items-center justify-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-[#0F1E36]/90 hover:bg-[#EF5A24]/10 border border-[#EF5A24]/30 hover:border-[#EF5A24] text-[10px] text-[#EF5A24] hover:text-white transition-all duration-300 font-technical shadow-lg backdrop-blur-md',
+              isMapFullscreen ? 'top-4 right-4' : 'top-16 sm:top-20 right-4'
+            ]"
           >
             <UIcon :name="isMapFullscreen ? 'i-lucide-minimize-2' : 'i-lucide-maximize-2'" class="w-3.5 h-3.5" />
             <span>{{ isMapFullscreen ? 'EXIT FULL' : 'FULL MAP' }}</span>
@@ -169,6 +177,7 @@
           <div 
             v-if="selectedRoomDetail" 
             class="absolute top-0 right-0 z-30 w-full md:w-[420px] h-full bg-[#070A12]/95 border-l border-[#EF5A24]/30 flex flex-col shadow-2xl"
+            style="view-transition-name: room-drawer"
           >
             <!-- Drawer Header -->
             <div class="p-5 border-b border-white/10 flex justify-between items-start">
@@ -176,7 +185,7 @@
                 <span class="text-[10px] font-technical text-[#EF5A24] uppercase font-bold tracking-wider">
                   {{ selectedRoomDetail.building_id.toUpperCase() }} // FLOOR {{ selectedRoomDetail.floor }}
                 </span>
-                <h3 class="text-xl font-bold text-white mt-1">{{ selectedRoomDetail.name }}</h3>
+                <h3 class="text-xl font-bold text-white mt-1" style="view-transition-name: room-title">{{ selectedRoomDetail.name }}</h3>
                 <span class="text-xs text-white/50">{{ selectedRoomDetail.departments[0] }}</span>
               </div>
               <button 
@@ -189,6 +198,18 @@
 
             <!-- Drawer Content -->
             <div class="flex-grow overflow-y-auto p-5 flex flex-col gap-6">
+              <!-- Room Preview Image -->
+              <div class="relative w-full h-44 bg-slate-950 rounded-xl overflow-hidden border border-white/10 shrink-0 select-none">
+                <NuxtImg 
+                  :src="labImages[0]" 
+                  format="avif"
+                  class="w-full h-full object-cover filter brightness-[0.85] contrast-[1.10]" 
+                  style="view-transition-name: room-image"
+                  alt="Laboratory Preview"
+                />
+                <div class="absolute inset-0 bg-gradient-to-t from-[#070A12] via-transparent to-transparent opacity-65"></div>
+              </div>
+
               <!-- Lab Lead info -->
               <div class="vgu-panel p-3.5 rounded-lg border border-white/5 text-xs flex flex-col gap-1 bg-white/5">
                 <div class="text-white/40 font-technical uppercase tracking-wider font-semibold">Laboratory Coordinator</div>
@@ -234,13 +255,23 @@
               </div>
             </div>
 
-            <!-- View All / Redirect Button -->
-            <div class="p-4 border-t border-white/10 bg-[#0F1E36]/40 flex flex-col gap-2 shrink-0">
+            <!-- View All / Redirect Buttons -->
+            <div class="p-4 border-t border-white/10 bg-[#0F1E36]/40 flex gap-2 shrink-0">
               <button 
                 @click="openRoomTour(selectedRoomDetail)" 
-                class="w-full bg-[#EF5A24] hover:bg-[#EF5A24]/90 text-white font-technical font-bold text-xs py-3 rounded-lg text-center shadow-[0_0_15px_rgba(239,90,36,0.3)] transition-all duration-300"
+                class="flex-grow bg-[#EF5A24] hover:bg-[#EF5A24]/90 text-white font-technical font-bold text-xs py-3 rounded-lg text-center shadow-[0_0_15px_rgba(239,90,36,0.3)] transition-all duration-300 cursor-pointer"
               >
-                VIEW ALL MACHINES IN THIS ROOM
+                VIEW TOUR
+              </button>
+
+              <button 
+                v-if="selectedRoomDetail.vr_panorama"
+                @click="openRoom3D(selectedRoomDetail)" 
+                class="cyber-3d-btn shrink-0 p-3 rounded-lg cursor-pointer"
+                title="View Room in 3D"
+              >
+                <UIcon name="i-lucide-box" class="w-4 h-4 shrink-0 text-[#06B6D4]" />
+                <span class="cyber-3d-btn-text">3D Room</span>
               </button>
             </div>
           </div>
@@ -475,6 +506,34 @@ function goToQueries() {
 
 function openRoomTour(room) {
   router.push(`/tour/${room.room_id}`)
+}
+
+const labImages = computed(() => {
+  if (!selectedRoomDetail.value || !selectedRoomDetail.value.departments || !Array.isArray(selectedRoomDetail.value.departments)) {
+    return ['/images/labs/materials_science_lab.png', '/images/labs/electrical_engineering_lab.png']
+  }
+  const isEE = selectedRoomDetail.value.departments.some(d => 
+    d && typeof d === 'string' && (
+      d.toLowerCase().includes('electrical') || 
+      d.toLowerCase().includes('computer') || 
+      d.toLowerCase().includes('it')
+    )
+  )
+  if (isEE) {
+    return [
+      '/images/labs/electrical_engineering_lab.png',
+      '/images/labs/materials_science_lab.png'
+    ]
+  } else {
+    return [
+      '/images/labs/materials_science_lab.png',
+      '/images/labs/electrical_engineering_lab.png'
+    ]
+  }
+})
+
+function openRoom3D(room) {
+  router.push(`/tour/${room.room_id}?view=3d`)
 }
 </script>
 

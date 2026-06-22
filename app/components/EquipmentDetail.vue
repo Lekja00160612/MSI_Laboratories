@@ -67,16 +67,15 @@
             <div class="relative w-full aspect-video rounded-xl overflow-hidden border border-white/10 bg-[#070A12] flex items-center justify-center">
               
               <!-- 1. 3D Model Viewer -->
-              <model-viewer
-                v-if="activeMedia.type === 'model_3d'"
-                :src="activeMedia.src"
-                alt="Interactive 3D model of scientific equipment"
-                auto-rotate
-                camera-controls
-                ar
-                class="w-full h-full"
-                style="width: 100%; height: 100%; border: none;"
-              ></model-viewer>
+              <ClientOnly v-if="activeMedia.type === 'model_3d'">
+                <VguThreeViewer
+                  :src="activeMedia.src"
+                  :initial-render-mode="activeMedia.renderMode"
+                  :initial-auto-rotate="activeMedia.autoRotate"
+                  class="w-full h-full"
+                  style="width: 100%; height: 100%; border: none;"
+                />
+              </ClientOnly>
               
               <!-- 2. Interactive X-Ray Depth Scanner -->
               <div v-else-if="activeMedia.type === 'internal_blueprint'" class="relative w-full h-full bg-black group">
@@ -432,8 +431,27 @@ const mediaList = computed(() => {
     const src = isObj ? m.model_3d.src || m.model_3d.url || m.model_3d.path : m.model_3d
     const title = (isObj && m.model_3d.title) ? m.model_3d.title : 'Diagnostic: 3D Hull Projection'
     const position = (isObj && typeof m.model_3d.position === 'number') ? m.model_3d.position : 10
+    
+    // Parse render mode
+    let renderMode = 'realistic'
+    if (isObj) {
+      const mode = m.model_3d.render_mode || m.model_3d.renderMode
+      if (mode && ['realistic', 'hologram'].includes(mode.toLowerCase())) {
+        renderMode = mode.toLowerCase()
+      }
+    }
+
+    // Parse auto rotate
+    let autoRotate = true
+    if (isObj) {
+      const rot = m.model_3d.auto_rotate ?? m.model_3d.autoRotate
+      if (typeof rot === 'boolean') {
+        autoRotate = rot
+      }
+    }
+
     if (src) {
-      list.push({ type: 'model_3d', src, title, position })
+      list.push({ type: 'model_3d', src, title, position, renderMode, autoRotate })
     }
   }
 

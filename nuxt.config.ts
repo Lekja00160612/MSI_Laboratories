@@ -46,6 +46,10 @@ function getEquipmentRoutes() {
 export default defineNuxtConfig({
   compatibilityDate: '2025-07-15',
 
+  experimental: {
+    viewTransition: true
+  },
+
   app: {
     head: {
       link: [
@@ -63,18 +67,7 @@ export default defineNuxtConfig({
           href: 'https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700;800&family=Space+Mono:wght@400;700&family=Inter:wght@300;400;500;600;700;800&display=swap'
         }
       ],
-      script: [
-        {
-          type: 'module',
-          src: 'https://ajax.googleapis.com/ajax/libs/model-viewer/4.0.0/model-viewer.min.js'
-        }
-      ]
-    }
-  },
-
-  vue: {
-    compilerOptions: {
-      isCustomElement: (tag) => tag === 'model-viewer'
+      script: []
     }
   },
 
@@ -100,6 +93,19 @@ export default defineNuxtConfig({
   },
 
   devtools: { enabled: true },
+
+  vite: {
+    optimizeDeps: {
+      include: [
+        '@vue/devtools-core',
+        '@vue/devtools-kit',
+        'three',
+        'three/examples/jsm/loaders/GLTFLoader.js',
+        'three/examples/jsm/controls/OrbitControls.js',
+        'maplibre-gl'
+      ]
+    }
+  },
 
   hooks: {
     'build:before'() {
@@ -178,17 +184,7 @@ export default defineNuxtConfig({
             }
           }
         },
-        {
-          urlPattern: /^https:\/\/ajax\.googleapis\.com\/ajax\/libs\/model-viewer\/.*/i,
-          handler: 'CacheFirst',
-          options: {
-            cacheName: 'model-viewer-assets-cache',
-            expiration: {
-              maxEntries: 10,
-              maxAgeSeconds: 60 * 60 * 24 * 30 // 30 Days
-            }
-          }
-        },
+
         {
           urlPattern: /^\/data\/floorplans\/.*\.json$/i,
           handler: 'NetworkFirst',

@@ -17,7 +17,8 @@ export default defineContentConfig({
           office: z.string()
         }),
         status: z.string(),
-        highlighted_equipment: z.array(z.string())
+        highlighted_equipment: z.array(z.string()),
+        vr_panorama: z.string().optional()
       })
     }),
     equipment: defineCollection({

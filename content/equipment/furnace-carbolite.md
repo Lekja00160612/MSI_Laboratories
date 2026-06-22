@@ -28,9 +28,11 @@ media:
       title: "Quaternary Scanning Visual"
       position: 43
   model_3d:
-    src: "https://modelviewer.dev/shared-assets/models/Astronaut.glb"
+    src: "https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/DamagedHelmet/glTF-Binary/DamagedHelmet.glb"
     title: "Diagnostic: 3D Chamber Model"
     position: 10
+    render_mode: "realistic"
+    auto_rotate: true
   video:
     src: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4"
     title: "Chamber Sintering Demonstration"

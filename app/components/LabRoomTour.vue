@@ -1,7 +1,7 @@
 <template>
   <div v-if="room" class="fixed inset-0 z-50 bg-[#070A12] text-white flex flex-col font-sans select-none">
     <!-- Visual Cyber Scan Overlays -->
-    <div class="absolute inset-0 pointer-events-none z-45 scanline laser-scan"></div>
+    <div v-if="viewMode !== '3d'" class="absolute inset-0 pointer-events-none z-45 scanline laser-scan"></div>
 
     <!-- Fixed Cyber Header -->
     <header class="fixed top-0 left-0 right-0 h-16 border-b border-[#EF5A24]/20 bg-[#0F1E36]/90 backdrop-blur-md px-6 flex items-center justify-between z-50">
@@ -27,15 +27,34 @@
     </header>
 
     <!-- Visual Scroll Progress Tracker -->
-    <div class="fixed top-16 left-0 right-0 h-[3px] bg-white/5 z-50">
+    <div v-if="viewMode !== '3d'" class="fixed top-16 left-0 right-0 h-[3px] bg-white/5 z-50">
       <div 
         class="h-full bg-gradient-to-r from-[#EF5A24] to-[#06B6D4] transition-all duration-75 shadow-[0_0_8px_#06B6D4]"
         :style="{ width: `${scrollPercent}%` }"
       ></div>
     </div>
 
-    <!-- Snap Scrollable Fullscreen Presentation Container -->
+    <!-- 1. Pure 3D VR Panorama Room Viewer Mode — fills entire viewport below header -->
+    <div v-if="viewMode === '3d'" class="absolute inset-0 pt-16 bg-black z-30">
+      <VguRoomVrViewer
+        :room="room"
+        :panorama-url="panoramaUrl"
+      />
+
+      <!-- Toggle back to photo mode (inside the 3D pane, bottom right) -->
+      <button
+        @click="toggleViewMode"
+        class="absolute bottom-6 left-6 z-50 flex items-center gap-2 px-3.5 py-2 rounded-lg border border-white/15 bg-black/50 text-white/60 hover:text-white font-mono text-[10px] tracking-widest uppercase transition-all hover:bg-black/70 cursor-pointer backdrop-blur-md pointer-events-auto"
+        title="Switch to Photo Mode"
+      >
+        <UIcon name="i-lucide-image" class="w-3.5 h-3.5 shrink-0" />
+        <span>Photo Mode</span>
+      </button>
+    </div>
+
+    <!-- 2. Standard Interactive Lab Tour presentation -->
     <div 
+      v-else
       ref="scrollContainer"
       @scroll="handleScroll"
       class="flex-grow snap-y snap-mandatory scroll-smooth overflow-y-auto w-full h-full"
@@ -47,10 +66,12 @@
           ref="slide0Image"
           class="w-full lg:w-3/5 relative h-screen lg:h-full snap-start shrink-0 overflow-hidden border-b lg:border-b-0 lg:border-r border-white/10 bg-black flex items-center justify-center pt-16 lg:pt-0"
         >
+          <!-- Standard Photo Mode -->
           <NuxtImg 
             :src="labImages[0]" 
             format="avif"
             class="w-full h-full object-cover filter brightness-[0.85] contrast-[1.10]" 
+            style="view-transition-name: room-image"
             alt="Laboratory Widescreen Interior"
           />
 
@@ -76,6 +97,17 @@
               </span>
             </div>
           </div>
+
+          <!-- Floating 3D VR Mode Toggle Button (Only if room has a panorama) -->
+          <button 
+            v-if="panoramaUrl"
+            @click="toggleViewMode" 
+            class="absolute top-20 right-4 z-45 cyber-3d-btn px-3 py-2 rounded-lg pointer-events-auto cursor-pointer"
+            title="Switch to 3D Room"
+          >
+            <UIcon name="i-lucide-box" class="w-4 h-4 shrink-0" />
+            <span class="cyber-3d-btn-text">3D Room</span>
+          </button>
 
           <!-- Bottom HUD Panel -->
           <div class="absolute bottom-4 left-4 right-4 z-45 bg-[#0F1E36]/90 border border-[#06B6D4]/20 p-3.5 rounded-lg backdrop-blur-sm pointer-events-none flex justify-between items-center text-[10px] font-technical text-white/80">
@@ -104,6 +136,7 @@
         <div 
           ref="slide0Details"
           class="w-full lg:w-2/5 relative h-screen lg:h-full p-6 md:p-8 pt-20 lg:pt-8 flex flex-col gap-4 bg-[#0F1E36]/90 backdrop-blur-md snap-start shrink-0 overflow-y-auto"
+          style="view-transition-name: room-drawer"
         >
           <!-- Back to image button for mobile -->
           <div class="lg:hidden shrink-0 mb-1">
@@ -117,7 +150,7 @@
           </div>
           <div class="flex flex-col gap-1 shrink-0">
             <span class="text-[#EF5A24] text-xs font-technical uppercase font-extrabold tracking-widest">LAB MANDATE</span>
-            <h2 class="text-xl md:text-2xl font-extrabold text-white leading-snug">{{ room.name }}</h2>
+            <h2 class="text-xl md:text-2xl font-extrabold text-white leading-snug" style="view-transition-name: room-title">{{ room.name }}</h2>
             <div class="flex gap-2 flex-wrap mt-2">
               <UBadge v-for="dept in room.departments" :key="dept" variant="outline" color="info" class="font-technical text-[9px] uppercase tracking-wider">
                 {{ dept }}
@@ -126,7 +159,7 @@
           </div>
 
           <!-- Internally Scrollable Details Area -->
-          <div class="flex-grow overflow-y-auto pr-1 flex flex-col gap-4 my-2">
+          <div class="flex-grow overflow-y-auto pr-1 flex flex-col gap-4 my-2 pb-4 pt-4">
             <!-- Leadership Card -->
             <UCard class="bg-[#0F1E36]/40 border border-[#06B6D4]/20 shrink-0">
               <template #header>
@@ -163,8 +196,20 @@
             </UCard>
           </div>
 
-          <!-- Scroll Prompter Button at bottom of intro (Fixed) -->
-          <div class="pt-4 flex justify-center shrink-0 border-t border-white/10 mt-auto">
+          <!-- Action Buttons at bottom of intro -->
+          <div class="pt-4 flex flex-col gap-2 shrink-0 border-t border-white/10 mt-auto">
+            <!-- 3D Panorama Button (if room has a panorama URL) -->
+            <button
+              v-if="panoramaUrl"
+              @click="toggleViewMode"
+              class="w-full flex items-center justify-center gap-2.5 py-2.5 px-4 rounded-lg border border-[#06B6D4]/40 bg-[#06B6D4]/10 text-[#06B6D4] hover:bg-[#06B6D4]/20 hover:text-white font-technical text-[10px] font-bold uppercase tracking-widest transition-all duration-200 cursor-pointer group"
+              title="View 3D Panorama"
+            >
+              <UIcon name="i-lucide-box" class="w-3.5 h-3.5 shrink-0" />
+              <span>VIEW 360° PANORAMA</span>
+              <span class="text-[8px] font-mono text-white/30 group-hover:text-[#06B6D4]/60 ml-auto">3D</span>
+            </button>
+
             <UButton 
               v-if="equipment.length"
               @click="scrollToNext(1)"
@@ -381,6 +426,26 @@ const emit = defineEmits(['close', 'select-equipment'])
 const scrollContainer = ref(null)
 const scrollPercent = ref(0)
 const currentSlideIndex = ref(0)
+const viewMode = ref('photo')
+
+function toggleViewMode() {
+  viewMode.value = viewMode.value === '3d' ? 'photo' : '3d'
+  const query = { ...route.query }
+  if (viewMode.value === '3d') {
+    query.view = '3d'
+  } else {
+    delete query.view
+  }
+  router.replace({ query })
+}
+
+watch(() => route.query.view, (newVal) => {
+  if (newVal === '3d') {
+    viewMode.value = '3d'
+  } else {
+    viewMode.value = 'photo'
+  }
+})
 
 const slide0Image = ref(null)
 const slide0Details = ref(null)
@@ -490,6 +555,17 @@ const labImages = computed(() => {
   }
 })
 
+// Panorama URL — resolves from room.vr_panorama field in the content DB
+const panoramaUrl = computed(() => {
+  // Primary: use the room's own vr_panorama field from content
+  if (props.room?.vr_panorama) return props.room.vr_panorama
+  // Fallback: known rooms with panoramas (in case content DB cache hasn't propagated)
+  const knownPanoramas = {
+    'b1-103': '/images/labs/panoramas/b1-103_panorama.jpg'
+  }
+  return knownPanoramas[props.room?.room_id] || null
+})
+
 // Helper to get clean machine ID matching path
 function getCleanId(mach) {
   if (!mach || !mach.id) return ''
@@ -583,6 +659,9 @@ function scrollToActiveMachine() {
 
 // Scroll on mount
 onMounted(() => {
+  if (route.query.view === '3d') {
+    viewMode.value = '3d'
+  }
   scrollToActiveMachine()
 })
 

@@ -16,6 +16,12 @@ media:
   images:
     - "/images/equipment/xrd-exterior.png"
     - "/images/equipment/xrd-front.png"
+  model_3d:
+    src: "https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/AntiqueCamera/glTF-Binary/AntiqueCamera.glb"
+    title: "Diagnostic: XRD Precision Goniometer"
+    position: 10
+    render_mode: "realistic"
+    auto_rotate: true
   internal_blueprint: "/images/equipment/xrd-schematic.svg"
   ambient_color: "#EF5A24"
 optional_information:

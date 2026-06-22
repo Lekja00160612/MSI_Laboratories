@@ -14,6 +14,12 @@ location:
 media:
   images:
     - "/images/equipment/laser-exterior.png"
+  model_3d:
+    src: "https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/Lantern/glTF-Binary/Lantern.glb"
+    title: "Diagnostic: Optical Alignment Matrix"
+    position: 10
+    render_mode: "hologram"
+    auto_rotate: false
   ambient_color: "#8B5CF6"
 optional_information:
   physics:

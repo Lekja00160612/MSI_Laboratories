@@ -25,7 +25,7 @@ These fields must be populated in every equipment file. Omitting them will cause
 | `manufacturer` | String | The brand or manufacturer (e.g., `Agilent Technologies`). |
 | `departments` | Array of strings | List of academic divisions hosting the equipment (e.g., `["Chemistry", "Applied Physics"]`). |
 | `location` | Object | Sub-fields: `building_id` (e.g. `cluster-1`), `floor` (Integer), `room_id` (e.g. `b1-103`), `station_id` (e.g. `station-ch-1`). |
-| `media` | Object | Interactive media elements. Sub-fields: `images` (Array of strings or objects containing `src`, `title`, optional `position` integer, and optional `highlighted: true` boolean), `model_3d` (Optional string path or object with `src`, `title`, and `position`), `video` (Optional string path or object with `src`, `title`, and `position`), `internal_blueprint` (Optional string path or object with `src`, `title`, `position`, and optional `target_image` cover override path), `ambient_color` (Optional HEX color). |
+| `media` | Object | Interactive media elements. Sub-fields: `images` (Array of strings or objects containing `src`, `title`, optional `position` integer, and optional `highlighted: true` boolean), `model_3d` (Optional string path or object with `src`, `title`, `position`, optional `render_mode` (`"realistic"`/`"hologram"`), and optional `auto_rotate` (`true`/`false`)), `video` (Optional string path or object with `src`, `title`, and `position`), `internal_blueprint` (Optional string path or object with `src`, `title`, `position`, and optional `target_image` cover override path), `ambient_color` (Optional HEX color). |
 | `status` | String | The system status (typically `operational` or `maintenance`). |
 
 ---
@@ -117,6 +117,8 @@ media:
     src: "/3d/furnace.glb"
     title: "Diagnostic: 3D Chamber Model"
     position: 10         # Custom order position in the diagnostic carousel
+    render_mode: "hologram"  # Optional: Default render mode ("realistic" or "hologram")
+    auto_rotate: true    # Optional: Enable/disable auto-rotation (true or false)
   video:
     src: "/images/equipment/furnace-process.mp4"
     title: "Chamber Sintering Demonstration"

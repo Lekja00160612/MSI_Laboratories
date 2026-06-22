@@ -16,6 +16,12 @@ media:
   images:
     - "/images/equipment/sem-exterior.png"
     - "/images/equipment/sem-ui.png"
+  model_3d:
+    src: "https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/SciFiHelmet/glTF-Binary/SciFiHelmet.glb"
+    title: "Diagnostic: SEM Topographic Scanning"
+    position: 10
+    render_mode: "hologram"
+    auto_rotate: true
   internal_blueprint: "/images/equipment/sem-schematic.svg"
   ambient_color: "#EF5A24"
 optional_information:
