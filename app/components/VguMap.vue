@@ -34,30 +34,32 @@
     </div>
 
     <!-- Left Hand Elevator UI (Floors) -->
-    <div v-if="selectedBuilding" class="absolute left-4 sm:left-6 top-1/2 -translate-y-1/2 z-20 flex flex-col gap-1.5 sm:gap-2 bg-[#0F1E36]/90 backdrop-blur-md border border-[#EF5A24]/30 p-1.5 sm:p-2 rounded-full shadow-lg">
-      <button 
-        v-for="floorNum in floors" 
-        :key="floorNum" 
-        @click="selectFloor(floorNum)"
-        :class="[
-          'w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center text-[10px] sm:text-xs font-technical font-bold border transition-all duration-300',
-          selectedFloor === floorNum 
-            ? 'bg-[#EF5A24] border-[#EF5A24] text-white shadow-[0_0_10px_#EF5A24]' 
-            : floorsWithLabs.has(floorNum)
-              ? 'border-[#06B6D4]/60 bg-[#06B6D4]/10 text-[#06B6D4] shadow-[0_0_8px_rgba(6,182,212,0.2)] hover:border-[#06B6D4] hover:text-white'
-              : 'border-white/10 hover:border-[#EF5A24]/60 text-white/70 hover:text-white'
-        ]"
-      >
-        L{{ floorNum }}
-      </button>
-      <button 
-        @click="resetMap" 
-        class="w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center text-[10px] sm:text-xs border border-[#EF5A24]/20 text-[#EF5A24] hover:bg-[#EF5A24]/10 transition-all duration-300"
-        title="Exit Building"
-      >
-        ✕
-      </button>
-    </div>
+    <Transition name="scale-fade">
+      <div v-if="selectedBuilding" class="absolute left-4 sm:left-6 top-1/2 -translate-y-1/2 z-20 flex flex-col gap-1.5 sm:gap-2 bg-[#0F1E36]/90 backdrop-blur-md border border-[#EF5A24]/30 p-1.5 sm:p-2 rounded-full shadow-lg">
+        <button 
+          v-for="floorNum in floors" 
+          :key="floorNum" 
+          @click="selectFloor(floorNum)"
+          :class="[
+            'w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center text-[10px] sm:text-xs font-technical font-bold border transition-all duration-300',
+            selectedFloor === floorNum 
+              ? 'bg-[#EF5A24] border-[#EF5A24] text-white shadow-[0_0_10px_#EF5A24]' 
+              : floorsWithLabs.has(floorNum)
+                ? 'border-[#06B6D4]/60 bg-[#06B6D4]/10 text-[#06B6D4] shadow-[0_0_8px_rgba(6,182,212,0.2)] hover:border-[#06B6D4] hover:text-white'
+                : 'border-white/10 hover:border-[#EF5A24]/60 text-white/70 hover:text-white'
+          ]"
+        >
+          L{{ floorNum }}
+        </button>
+        <button 
+          @click="resetMap" 
+          class="w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center text-[10px] sm:text-xs border border-[#EF5A24]/20 text-[#EF5A24] hover:bg-[#EF5A24]/10 transition-all duration-300"
+          title="Exit Building"
+        >
+          ✕
+        </button>
+      </div>
+    </Transition>
   </div>
 </template>
 
@@ -112,6 +114,7 @@ const mapContainer = ref(null)
 let map = null
 const mapLoaded = ref(false)
 const currentFloorGeojson = ref(null)
+let resizeObserver = null
 
 const config = useRuntimeConfig()
 const displayOnlyRoomsWithMachines = computed(() => config.public.displayOnlyRoomsWithMachines)
@@ -389,9 +392,24 @@ onMounted(async () => {
       renderClusterLabels()
     }
   })
+
+  // Resize observer to ensure MapLibre canvas updates when container dimensions change
+  if (typeof window !== 'undefined' && 'ResizeObserver' in window) {
+    resizeObserver = new ResizeObserver(() => {
+      if (map) {
+        map.resize()
+      }
+    })
+    if (mapContainer.value) {
+      resizeObserver.observe(mapContainer.value)
+    }
+  }
 })
 
 onUnmounted(() => {
+  if (resizeObserver) {
+    resizeObserver.disconnect()
+  }
   if (map) map.remove()
   clearRoomMarkers()
   clearClusterMarkers()

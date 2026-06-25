@@ -4,7 +4,7 @@
     <div v-if="viewMode !== '3d'" class="absolute inset-0 pointer-events-none z-45 scanline laser-scan"></div>
 
     <!-- Fixed Cyber Header -->
-    <header class="fixed top-0 left-0 right-0 h-16 border-b border-[#EF5A24]/20 bg-[#0F1E36]/90 backdrop-blur-md px-6 flex items-center justify-between z-50">
+    <header class="fixed top-0 left-0 right-0 h-16 landscape:h-11 border-b border-[#EF5A24]/20 bg-[#0F1E36]/90 backdrop-blur-md px-6 flex items-center justify-between z-50">
       <div class="flex items-center gap-3">
         <UButton
           color="neutral"
@@ -27,7 +27,7 @@
     </header>
 
     <!-- Visual Scroll Progress Tracker -->
-    <div v-if="viewMode !== '3d'" class="fixed top-16 left-0 right-0 h-[3px] bg-white/5 z-50">
+    <div v-if="viewMode !== '3d'" class="fixed top-16 landscape:top-11 left-0 right-0 h-[3px] bg-white/5 z-50">
       <div 
         class="h-full bg-gradient-to-r from-[#EF5A24] to-[#06B6D4] transition-all duration-75 shadow-[0_0_8px_#06B6D4]"
         :style="{ width: `${scrollPercent}%` }"
@@ -61,11 +61,11 @@
       style="-webkit-overflow-scrolling: touch;"
     >
       <!-- Slide 0: Lab Overview / Introduction -->
-      <section class="h-auto lg:h-screen w-full snap-none lg:snap-start shrink-0 relative flex flex-col lg:flex-row lg:pt-16 bg-[#070A12]">
+      <section class="h-auto lg:h-screen w-full snap-none lg:snap-start shrink-0 relative flex flex-col landscape:flex-row lg:flex-row lg:pt-16 landscape:pt-11 bg-[#070A12]">
         <!-- Left Column: Intimidating Widescreen Lab Image & Reticle HUD -->
         <div 
           ref="slide0Image"
-          class="w-full lg:w-3/5 relative h-screen lg:h-full snap-start shrink-0 overflow-hidden border-b lg:border-b-0 lg:border-r border-white/10 bg-black flex items-center justify-center pt-16 lg:pt-0"
+          class="w-full landscape:w-1/2 lg:w-3/5 relative h-screen landscape:h-full lg:h-full snap-start shrink-0 overflow-hidden border-b lg:border-b-0 landscape:border-b-0 lg:border-r landscape:border-r border-white/10 bg-black flex items-center justify-center pt-16 landscape:pt-11 lg:pt-0"
         >
           <!-- Standard Photo Mode -->
           <NuxtImg 
@@ -103,7 +103,7 @@
           <button 
             v-if="panoramaUrl"
             @click="toggleViewMode" 
-            class="absolute top-20 right-4 z-45 cyber-3d-btn px-3 py-2 rounded-lg pointer-events-auto cursor-pointer"
+            class="absolute top-20 landscape:top-14 right-4 z-45 cyber-3d-btn px-3 py-2 rounded-lg pointer-events-auto cursor-pointer"
             title="Switch to 3D Room"
           >
             <UIcon name="i-lucide-box" class="w-4 h-4 shrink-0" />
@@ -122,7 +122,7 @@
             </div>
           </div>
           <!-- Mobile Navigation Button -->
-          <div class="lg:hidden absolute bottom-20 left-1/2 -translate-x-1/2 z-45">
+          <div class="lg:hidden landscape:hidden absolute bottom-20 left-1/2 -translate-x-1/2 z-45">
             <button 
               @click="scrollToSlide0Details" 
               class="px-5 py-2.5 rounded-lg border border-[#EF5A24] bg-[#EF5A24]/20 hover:bg-[#EF5A24]/30 text-[10px] font-technical uppercase font-bold tracking-widest text-white flex items-center gap-2 shadow-[0_0_15px_rgba(239,90,36,0.3)] active:scale-95 transition-all"
@@ -136,11 +136,11 @@
         <!-- Right Column: Lab Profile Specs & Safe Instructions -->
         <div 
           ref="slide0Details"
-          class="w-full lg:w-2/5 relative h-screen lg:h-full p-6 md:p-8 pt-20 lg:pt-8 flex flex-col gap-4 bg-[#0F1E36]/90 backdrop-blur-md snap-start shrink-0 overflow-y-auto"
+          class="w-full landscape:w-1/2 lg:w-2/5 relative h-screen landscape:h-full lg:h-full p-6 md:p-8 pt-20 landscape:pt-11 lg:pt-8 flex flex-col gap-4 bg-[#0F1E36]/90 backdrop-blur-md snap-start shrink-0 overflow-y-auto"
           style="view-transition-name: room-drawer"
         >
           <!-- Back to image button for mobile -->
-          <div class="lg:hidden shrink-0 mb-1">
+          <div class="lg:hidden landscape:hidden shrink-0 mb-1">
             <button 
               @click="scrollToSlide0Image" 
               class="px-4 py-2 rounded-lg border border-[#EF5A24]/30 bg-[#EF5A24]/5 hover:bg-[#EF5A24]/10 text-[9px] font-technical uppercase font-bold tracking-widest text-[#EF5A24] flex items-center gap-1.5 active:scale-95 transition-all"
@@ -151,7 +151,7 @@
           </div>
           <div class="flex flex-col gap-1 shrink-0">
             <span class="text-[#EF5A24] text-xs font-technical uppercase font-extrabold tracking-widest">LAB MANDATE</span>
-            <h2 class="text-xl md:text-2xl font-extrabold text-white leading-snug" style="view-transition-name: room-title">{{ room.name }}</h2>
+            <h2 class="text-xl md:text-2xl landscape:text-base font-extrabold text-white leading-snug" style="view-transition-name: room-title">{{ room.name }}</h2>
             <div class="flex gap-2 flex-wrap mt-2">
               <UBadge v-for="dept in room.departments" :key="dept" variant="outline" color="info" class="font-technical text-[9px] uppercase tracking-wider">
                 {{ dept }}
@@ -229,7 +229,7 @@
       <section 
         v-for="(mach, idx) in equipment" 
         :key="mach.id"
-        class="h-screen w-full snap-start shrink-0 relative flex flex-col justify-center items-center lg:items-start p-6 lg:p-16 pt-20 bg-black overflow-hidden"
+        class="h-screen w-full snap-start shrink-0 relative flex flex-col justify-center items-center lg:items-start p-6 lg:p-16 pt-20 landscape:pt-11 landscape:p-2 bg-black overflow-hidden"
       >
         <!-- Widescreen Background Equipment Image -->
         <div class="absolute inset-0 z-10 flex items-center justify-center bg-black overflow-hidden">
@@ -245,12 +245,11 @@
           <div class="absolute inset-0 opacity-15 cyber-grid pointer-events-none"></div>
         </div>
 
-        <!-- Float Holographic Detail Card with dynamic tabs -->
         <div 
           class="z-30 max-w-xl w-full lg:w-auto mx-auto lg:mx-0 lg:ml-16 shrink-0 my-auto transition-all duration-[800ms] delay-100 ease-out"
           :class="currentSlideIndex === (isMobileView ? idx + 2 : idx + 1) ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'"
         >
-          <div class="vgu-panel p-5 border border-[#EF5A24]/30 shadow-2xl rounded-xl bg-[#0F1E36]/90 backdrop-blur-md flex flex-col gap-3.5 w-[92vw] sm:w-[500px] h-[440px] md:h-[480px]">
+          <div class="vgu-panel p-5 landscape:p-3.5 border border-[#EF5A24]/30 shadow-2xl rounded-xl bg-[#0F1E36]/90 backdrop-blur-md flex flex-col gap-3.5 landscape:gap-2 w-[92vw] sm:w-[500px] landscape:w-[480px] h-[440px] md:h-[480px] landscape:h-[calc(100vh-56px)]">
             <div>
               <div class="text-[#EF5A24] text-[10px] font-technical uppercase font-bold tracking-widest leading-none">
                 INSTRUMENT PROFILE // {{ idx + 1 }} OF {{ equipment.length }}
@@ -281,8 +280,8 @@
               </button>
             </div>
 
-            <!-- Tab Content Area (Scrollable height-constrained with fixed height) -->
-            <div class="flex-grow flex flex-col justify-start h-[190px] md:h-[220px] overflow-y-auto pr-1">
+            <!-- Tab Content Area (Scrollable flexbox-grown height) -->
+            <div class="flex-grow min-h-0 flex flex-col justify-start overflow-y-auto pr-1">
               <Transition name="fade" mode="out-in">
                 <div :key="getActiveTab(mach.id)">
                   <!-- 1. Overview Tab -->

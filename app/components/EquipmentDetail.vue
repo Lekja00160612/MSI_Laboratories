@@ -4,7 +4,7 @@
     <div class="absolute inset-0 pointer-events-none z-45 scanline laser-scan"></div>
 
     <!-- Cyber Navbar Header -->
-    <header class="h-16 border-b border-[#EF5A24]/20 bg-[#0F1E36]/90 backdrop-blur-md px-6 flex items-center justify-between shrink-0 z-50">
+    <header class="h-16 landscape:h-11 border-b border-[#EF5A24]/20 bg-[#0F1E36]/90 backdrop-blur-md px-6 flex items-center justify-between shrink-0 z-50">
       <div class="flex items-center gap-3">
         <!-- Back Button -->
         <UButton
@@ -28,17 +28,17 @@
     </header>
 
     <!-- Main Container split into left (media 2/5) and right (content 3/5) -->
-    <div class="flex-grow h-[calc(100vh-4rem)] lg:h-auto overflow-y-auto lg:overflow-hidden snap-y snap-mandatory scroll-smooth flex flex-col lg:flex-row">
+    <div class="flex-grow h-[calc(100vh-4rem)] landscape:h-[calc(100vh-2.75rem)] lg:h-auto overflow-y-auto lg:overflow-hidden snap-y snap-mandatory scroll-smooth flex flex-col landscape:flex-row lg:flex-row">
       <!-- Left side: Stacked Media Panels (3D Model, 2D X-Ray Scanner, Photo Gallery) -->
       <div 
         ref="mediaPanel"
-        class="w-full lg:w-2/5 h-[calc(100vh-4rem)] lg:h-full snap-start shrink-0 p-6 md:p-8 flex flex-col gap-6 border-b lg:border-b-0 lg:border-r border-white/10 overflow-y-auto lg:shrink"
+        class="w-full landscape:w-2/5 lg:w-2/5 h-[calc(100vh-4rem)] landscape:h-full lg:h-full snap-start shrink-0 p-6 md:p-8 landscape:p-3 flex flex-col gap-6 landscape:gap-2.5 border-b lg:border-b-0 landscape:border-b-0 lg:border-r landscape:border-r border-white/10 overflow-y-auto lg:shrink"
       >
         <div class="flex flex-col gap-1">
           <div class="text-[#EF5A24] text-xs font-technical uppercase font-extrabold tracking-widest">
             {{ item.manufacturer }}
           </div>
-          <h2 class="text-2xl md:text-3xl font-extrabold text-white tracking-tight leading-tight">
+          <h2 class="text-2xl md:text-3xl landscape:text-lg font-extrabold text-white tracking-tight leading-tight">
             {{ item.title }}
           </h2>
           <div class="flex gap-2 flex-wrap mt-2">
@@ -125,12 +125,30 @@
                   <span class="absolute bottom-2 left-2 w-3 h-3 border-b-2 border-l-2 border-[#06B6D4]/40"></span>
                   <span class="absolute bottom-2 right-2 w-3 h-3 border-b-2 border-r-2 border-[#06B6D4]/40"></span>
                   
-                  <div class="absolute top-3 right-3 flex flex-col items-end gap-0.5 text-[8px] font-technical text-[#06B6D4]/70 bg-black/45 px-1.5 py-1 rounded border border-white/5 backdrop-blur-xs">
+                  <!-- HUD Panel (Collapsible) -->
+                  <div 
+                    v-if="showXrayHud" 
+                    class="absolute top-3 right-3 flex flex-col items-end gap-0.5 text-[8px] font-technical text-[#06B6D4]/70 bg-black/85 px-2 py-1.5 rounded border border-[#06B6D4]/30 backdrop-blur-sm pointer-events-auto"
+                  >
+                    <div class="flex items-center justify-between gap-4 w-full border-b border-[#06B6D4]/20 pb-0.5 mb-0.5">
+                      <span class="text-[7px] text-[#EF5A24] font-bold">X-RAY DIAGNOSTICS</span>
+                      <button @click="showXrayHud = false" class="text-white/40 hover:text-white cursor-pointer select-none">✕</button>
+                    </div>
                     <div>SYS_LINK: ONLINE</div>
                     <div>X-RAY SCAN: ACTIVE</div>
                     <div>RESOL: 0.12 NM</div>
                     <div>WAVELENGTH: 532 NM</div>
                   </div>
+
+                  <!-- Floating Toggle Button when HUD is hidden -->
+                  <button 
+                    v-else
+                    @click="showXrayHud = true"
+                    class="absolute top-3 right-3 z-30 p-1.5 rounded bg-black/60 hover:bg-black border border-white/10 hover:border-[#06B6D4]/50 text-[#06B6D4] cursor-pointer pointer-events-auto flex items-center justify-center transition-all duration-200"
+                    title="Show Diagnostics HUD"
+                  >
+                    <UIcon name="i-lucide-terminal" class="w-3.5 h-3.5" />
+                  </button>
                 </div>
 
                 <!-- Interactive Interaction Overlay -->
@@ -142,7 +160,7 @@
                 ></div>
 
                 <!-- Hint -->
-                <div class="absolute bottom-3 right-3 z-40 bg-black/85 px-3 py-1 rounded text-[9px] font-technical text-[#06B6D4] border border-[#06B6D4]/30 backdrop-blur-sm pointer-events-none">
+                <div v-if="showXrayHud" class="absolute bottom-3 right-3 landscape:bottom-2 landscape:right-2 z-40 bg-black/85 px-3 py-1 landscape:px-2 landscape:py-0.5 rounded text-[9px] landscape:text-[8px] font-technical text-[#06B6D4] border border-[#06B6D4]/30 backdrop-blur-sm pointer-events-none">
                   {{ isMobile ? 'TILT DEVICE TO X-RAY' : 'HOVER CURSOR TO X-RAY' }}
                 </div>
               </div>
@@ -170,10 +188,7 @@
               
               <div v-else class="text-white/30 text-xs font-technical">PHOTO DATA PENDING</div>
               
-              <!-- Help text overlay for specific media types -->
-              <div v-if="activeMedia.type === 'model_3d'" class="absolute bottom-3 right-3 z-40 bg-black/85 px-3 py-1 rounded text-[9px] font-technical text-[#06B6D4] border border-[#06B6D4]/30 backdrop-blur-sm pointer-events-none">
-                DRAG TO ROTATE 3D MODEL
-              </div>
+              <!-- Help text overlay moved inside VguThreeViewer -->
             </div>
           </div>
           
@@ -190,7 +205,7 @@
                 :key="idx"
                 @click="activeMediaIndex = idx"
                 :class="[
-                  'relative w-24 aspect-video rounded-lg overflow-hidden border-2 transition-all flex-shrink-0 bg-slate-900',
+                  'relative w-24 landscape:w-16 aspect-video rounded-lg overflow-hidden border-2 transition-all flex-shrink-0 bg-slate-900',
                   activeMediaIndex === idx ? 'border-[#EF5A24] shadow-[0_0_8px_rgba(239,90,36,0.3)]' : 'border-white/10 hover:border-white/30'
                 ]"
               >
@@ -229,7 +244,7 @@
           </div>
         </div>
         <!-- Mobile Navigation Footer -->
-        <div class="lg:hidden mt-auto pt-4 flex justify-center shrink-0">
+        <div class="lg:hidden landscape:hidden mt-auto pt-4 flex justify-center shrink-0">
           <button 
             @click="scrollToTabs" 
             class="px-5 py-2.5 rounded-lg border border-[#EF5A24] bg-[#EF5A24]/10 hover:bg-[#EF5A24]/20 text-[10px] font-technical uppercase font-bold tracking-widest text-white flex items-center gap-2 shadow-[0_0_15px_rgba(239,90,36,0.2)] active:scale-95 transition-all"
@@ -243,10 +258,10 @@
       <!-- Right side: Dynamic Content Tabs (Scrollable, Wider lg:w-3/5 layout) -->
       <div 
         ref="tabsPanel"
-        class="w-full lg:w-3/5 h-[calc(100vh-4rem)] lg:h-full snap-start shrink-0 p-6 md:p-8 overflow-y-auto flex flex-col gap-6 bg-[#0F1E36]/10 select-text"
+        class="w-full landscape:w-3/5 lg:w-3/5 h-[calc(100vh-4rem)] landscape:h-full lg:h-full snap-start shrink-0 p-6 md:p-8 landscape:p-3 overflow-y-auto flex flex-col gap-6 landscape:gap-2.5 bg-[#0F1E36]/10 select-text"
       >
         <!-- Back to diagnostics button for mobile -->
-        <div class="lg:hidden shrink-0 mb-1">
+        <div class="lg:hidden landscape:hidden shrink-0 mb-1">
           <button 
             @click="scrollToMedia" 
             class="px-4 py-2 rounded-lg border border-[#EF5A24]/30 bg-[#EF5A24]/5 hover:bg-[#EF5A24]/10 text-[9px] font-technical uppercase font-bold tracking-widest text-[#EF5A24] flex items-center gap-1.5 active:scale-95 transition-all"
@@ -407,6 +422,7 @@ const emit = defineEmits(['close'])
 const activeMediaIndex = ref(0)
 const revealContainer = ref(null)
 const activeTab = ref('overview')
+const showXrayHud = ref(typeof window !== 'undefined' ? (window.innerWidth > 768 && window.innerHeight > 500) : true)
 
 const mediaPanel = ref(null)
 const tabsPanel = ref(null)

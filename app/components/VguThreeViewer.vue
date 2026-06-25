@@ -33,9 +33,13 @@
 
     <!-- Cyber HUD Overlays -->
     <div 
-      v-if="!loading && !error" 
-      class="absolute top-3 left-3 z-20 flex flex-col gap-0.5 text-[8px] font-technical text-[#06B6D4]/70 bg-[#070A12]/80 px-2 py-1.5 rounded border border-white/5 backdrop-blur-md pointer-events-none select-none"
+      v-if="!loading && !error && show3dHud" 
+      class="absolute top-3 left-3 z-20 flex flex-col gap-0.5 text-[8px] font-technical text-[#06B6D4]/70 bg-[#070A12]/92 px-2 py-1.5 rounded border border-[#06B6D4]/30 backdrop-blur-md pointer-events-auto select-none"
     >
+      <div class="flex items-center justify-between gap-4 w-full border-b border-[#06B6D4]/20 pb-0.5 mb-0.5">
+        <span class="text-[7px] text-[#EF5A24] font-bold">3D TELEMETRY</span>
+        <button @click="show3dHud = false" class="text-white/40 hover:text-white cursor-pointer select-none pointer-events-auto">✕</button>
+      </div>
       <div>SYS_STATUS: ONLINE</div>
       <div>RENDER_ENGINE: WEBGL_2</div>
       <div>MODEL_MESHES: {{ meshCount }}</div>
@@ -43,16 +47,26 @@
       <div>ROTATION: {{ autoRotate ? '0.15_RAD_S' : 'STATIC' }}</div>
     </div>
 
+    <!-- Small Floating Toggle Button if HUD is hidden -->
+    <button 
+      v-if="!loading && !error && !show3dHud"
+      @click="show3dHud = true"
+      class="absolute top-3 left-3 z-20 p-1.5 rounded bg-black/60 hover:bg-black border border-white/10 hover:border-[#06B6D4]/50 text-[#06B6D4] cursor-pointer pointer-events-auto flex items-center justify-center transition-all duration-200"
+      title="Show Telemetry HUD"
+    >
+      <UIcon name="i-lucide-terminal" class="w-3.5 h-3.5" />
+    </button>
+
     <!-- Controls Bar -->
     <div 
-      v-if="!loading && !error" 
-      class="absolute bottom-3 left-3 right-3 z-20 flex justify-between items-end gap-4 pointer-events-none select-none"
+      v-if="!loading && !error && show3dHud" 
+      class="absolute bottom-3 left-3 right-3 landscape:bottom-2 landscape:left-2 landscape:right-2 z-20 flex justify-between items-end gap-4 pointer-events-none select-none"
     >
       <div class="flex gap-2 pointer-events-auto">
         <!-- Shading Mode Button -->
         <button 
           @click="toggleRenderMode"
-          class="px-3 py-1.5 rounded border font-technical text-[9px] font-bold tracking-widest uppercase transition-all backdrop-blur-md select-none cursor-pointer"
+          class="px-3 py-1.5 landscape:px-2 landscape:py-1 rounded border font-technical text-[9px] font-bold tracking-widest uppercase transition-all backdrop-blur-md select-none cursor-pointer"
           :class="renderMode === 'hologram' 
             ? 'bg-[#06B6D4]/10 border-[#06B6D4] text-[#06B6D4] shadow-[0_0_10px_rgba(6,182,212,0.3)]' 
             : 'bg-[#070A12]/85 border-white/10 text-white/70 hover:border-white/30 hover:text-white'"
@@ -63,13 +77,18 @@
         <!-- Rotation Toggle Button -->
         <button 
           @click="toggleAutoRotate"
-          class="px-3 py-1.5 rounded border font-technical text-[9px] font-bold tracking-widest uppercase transition-all backdrop-blur-md select-none cursor-pointer"
+          class="px-3 py-1.5 landscape:px-2 landscape:py-1 rounded border font-technical text-[9px] font-bold tracking-widest uppercase transition-all backdrop-blur-md select-none cursor-pointer"
           :class="autoRotate 
             ? 'bg-[#EF5A24]/10 border-[#EF5A24] text-[#EF5A24] shadow-[0_0_10px_rgba(239,90,36,0.3)]' 
             : 'bg-[#070A12]/85 border-white/10 text-white/70 hover:border-white/30 hover:text-white'"
         >
           ROTATION: {{ autoRotate ? 'ON' : 'OFF' }}
         </button>
+      </div>
+
+      <!-- Drag Hint -->
+      <div class="bg-black/85 px-3 py-1 landscape:px-2 landscape:py-0.5 rounded text-[9px] landscape:text-[8px] font-technical text-[#06B6D4] border border-[#06B6D4]/30 backdrop-blur-sm pointer-events-none">
+        DRAG TO ROTATE 3D MODEL
       </div>
     </div>
   </div>
@@ -104,6 +123,7 @@ const meshCount = ref(0)
 
 const renderMode = ref(props.initialRenderMode)
 const autoRotate = ref(props.initialAutoRotate)
+const show3dHud = ref(typeof window !== 'undefined' ? (window.innerWidth > 768 && window.innerHeight > 500) : true)
 
 let THREE = null
 let OrbitControls = null

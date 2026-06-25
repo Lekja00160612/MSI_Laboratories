@@ -3,7 +3,7 @@
     <!-- Navbar / Cyber HUD Bar -->
     <header 
       :class="[
-        'h-16 border-b border-[#EF5A24]/20 bg-[#0F1E36]/80 backdrop-blur-md px-6 flex items-center justify-between z-30 shrink-0 transition-all duration-300',
+        'h-16 landscape:h-11 border-b border-[#EF5A24]/20 bg-[#0F1E36]/80 backdrop-blur-md px-6 flex items-center justify-between z-30 shrink-0 transition-all duration-300',
         isMapFullscreen ? 'hidden md:flex' : 'flex'
       ]"
     >
@@ -21,13 +21,13 @@
       <!-- Top Nav controls -->
       <div class="flex items-center gap-2 sm:gap-4">
         <button 
-          class="px-2.5 py-1 sm:px-4 sm:py-1.5 rounded-lg text-[10px] sm:text-xs font-technical border bg-[#EF5A24]/10 border-[#EF5A24] text-[#EF5A24] transition-all duration-300"
+          class="px-2.5 py-1 sm:px-4 sm:py-1.5 landscape:py-0.5 landscape:px-2 rounded-lg text-[10px] sm:text-xs landscape:text-[9px] font-technical border bg-[#EF5A24]/10 border-[#EF5A24] text-[#EF5A24] transition-all duration-300"
         >
           INTERACTIVE MAP
         </button>
         <button 
           @click="goToQueries" 
-          class="px-2.5 py-1 sm:px-4 sm:py-1.5 rounded-lg text-[10px] sm:text-xs font-technical border border-white/15 text-white/60 hover:text-white transition-all duration-300 cursor-pointer"
+          class="px-2.5 py-1 sm:px-4 sm:py-1.5 landscape:py-0.5 landscape:px-2 rounded-lg text-[10px] sm:text-xs landscape:text-[9px] font-technical border border-white/15 text-white/60 hover:text-white transition-all duration-300 cursor-pointer"
         >
           ALL INSTRUMENTS
         </button>
@@ -37,12 +37,12 @@
     <!-- Main View Switcher -->
     <main class="flex-grow relative overflow-hidden">
       <!-- 1. Interactive Spatial Map View -->
-      <div class="w-full h-full flex flex-col md:flex-row relative">
+      <div class="w-full h-full flex flex-col landscape:flex-row md:flex-row relative">
         <!-- Sidebar Navigation (Desktop) -->
         <aside 
           :class="[
             'w-full md:w-80 border-b md:border-b-0 md:border-r border-white/10 bg-[#070A12]/95 z-20 shrink-0 flex flex-col transition-all duration-300',
-            isMapFullscreen ? 'h-0 overflow-hidden md:h-full border-b-0' : 'h-1/3 md:h-full'
+            isMapFullscreen ? 'h-0 overflow-hidden md:h-full border-b-0' : 'h-1/3 md:h-full landscape:w-72 landscape:h-full landscape:border-r landscape:border-b-0'
           ]"
         >
           <!-- Single Line Header Mode (Fullscreen mobile map) -->
@@ -63,92 +63,94 @@
           <!-- Standard Sidebar Content -->
           <div :class="['flex-grow flex flex-col overflow-hidden', { 'hidden md:flex': isMapFullscreen }]">
             <div class="p-5 flex flex-col gap-4 overflow-y-auto h-full">
-              <!-- State A: Campus Map overview -->
-              <div v-if="!selectedBuilding" class="flex flex-col gap-4">
-                <h2 class="text-lg font-bold text-[#EF5A24]">VGU Campus Blocks</h2>
-                <p class="text-xs text-white/50 leading-relaxed">
-                  Click on the highlighted academic blocks on the interactive map or select below to explore laboratories.
-                </p>
-                <div class="flex flex-col gap-2.5 mt-2">
-                  <button 
-                    v-for="(tele, bId) in clusterTelemetry"
-                    :key="bId"
-                    @click="selectedBuilding = bId; selectedFloor = 1"
-                    class="relative flex items-center justify-between p-4 rounded-xl bg-[#0F1E36]/30 border border-white/10 hover:border-[#EF5A24] hover:bg-[#EF5A24]/5 hover:shadow-[0_0_15px_rgba(239,90,36,0.15)] text-left transition-all duration-300 group overflow-hidden"
-                  >
-                    <!-- Cyber corner decorations -->
-                    <span class="absolute top-0 left-0 w-1.5 h-1.5 border-t border-l border-[#EF5A24]/30 group-hover:border-[#EF5A24] transition-colors"></span>
-                    <span class="absolute top-0 right-0 w-1.5 h-1.5 border-t border-r border-[#EF5A24]/30 group-hover:border-[#EF5A24] transition-colors"></span>
-                    <span class="absolute bottom-0 left-0 w-1.5 h-1.5 border-b border-l border-[#EF5A24]/30 group-hover:border-[#EF5A24] transition-colors"></span>
-                    <span class="absolute bottom-0 right-0 w-1.5 h-1.5 border-b border-r border-[#EF5A24]/30 group-hover:border-[#EF5A24] transition-colors"></span>
+              <Transition name="fade-slide" mode="out-in">
+                <!-- State A: Campus Map overview -->
+                <div v-if="!selectedBuilding" class="flex flex-col gap-4" key="campus">
+                  <h2 class="text-lg font-bold text-[#EF5A24]">VGU Campus Blocks</h2>
+                  <p class="text-xs text-white/50 leading-relaxed">
+                    Click on the highlighted academic blocks on the interactive map or select below to explore laboratories.
+                  </p>
+                  <div class="flex flex-col gap-2.5 mt-2">
+                    <button 
+                      v-for="(tele, bId) in clusterTelemetry"
+                      :key="bId"
+                      @click="selectedBuilding = bId; selectedFloor = 1"
+                      class="relative flex items-center justify-between p-4 rounded-xl bg-[#0F1E36]/30 border border-white/10 hover:border-[#EF5A24] hover:bg-[#EF5A24]/5 hover:shadow-[0_0_15px_rgba(239,90,36,0.15)] text-left transition-all duration-300 group overflow-hidden"
+                    >
+                      <!-- Cyber corner decorations -->
+                      <span class="absolute top-0 left-0 w-1.5 h-1.5 border-t border-l border-[#EF5A24]/30 group-hover:border-[#EF5A24] transition-colors"></span>
+                      <span class="absolute top-0 right-0 w-1.5 h-1.5 border-t border-r border-[#EF5A24]/30 group-hover:border-[#EF5A24] transition-colors"></span>
+                      <span class="absolute bottom-0 left-0 w-1.5 h-1.5 border-b border-l border-[#EF5A24]/30 group-hover:border-[#EF5A24] transition-colors"></span>
+                      <span class="absolute bottom-0 right-0 w-1.5 h-1.5 border-b border-r border-[#EF5A24]/30 group-hover:border-[#EF5A24] transition-colors"></span>
 
-                    <div class="flex items-center gap-3">
-                      <div 
-                        class="w-10 h-10 rounded-lg flex items-center justify-center border transition-all duration-300"
-                        :class="[
-                          bId === 'cluster-1' || bId === 'cluster-5' 
-                            ? 'border-[#EF5A24]/20 group-hover:border-[#EF5A24] text-[#EF5A24] bg-[#EF5A24]/5' 
-                            : 'border-[#06B6D4]/20 group-hover:border-[#06B6D4] text-[#06B6D4] bg-[#06B6D4]/5'
-                        ]"
-                      >
-                        <UIcon :name="tele.icon" class="w-5 h-5" />
-                      </div>
-                      <div>
-                        <div class="font-technical text-[10px] font-bold text-white/50 tracking-wider flex items-center gap-1.5">
-                          <span>{{ tele.code }}</span>
-                          <span class="w-1 h-1 rounded-full bg-green-500 animate-pulse"></span>
-                          <span class="text-[8px] font-normal uppercase">ACTIVE</span>
+                      <div class="flex items-center gap-3">
+                        <div 
+                          class="w-10 h-10 rounded-lg flex items-center justify-center border transition-all duration-300"
+                          :class="[
+                            bId === 'cluster-1' || bId === 'cluster-5' 
+                              ? 'border-[#EF5A24]/20 group-hover:border-[#EF5A24] text-[#EF5A24] bg-[#EF5A24]/5' 
+                              : 'border-[#06B6D4]/20 group-hover:border-[#06B6D4] text-[#06B6D4] bg-[#06B6D4]/5'
+                          ]"
+                        >
+                          <UIcon :name="tele.icon" class="w-5 h-5" />
                         </div>
-                        <div class="font-extrabold text-sm text-white mt-0.5 group-hover:text-[#EF5A24] transition-colors">{{ tele.label }}</div>
+                        <div>
+                          <div class="font-technical text-[10px] font-bold text-white/50 tracking-wider flex items-center gap-1.5">
+                            <span>{{ tele.code }}</span>
+                            <span class="w-1 h-1 rounded-full bg-green-500 animate-pulse"></span>
+                            <span class="text-[8px] font-normal uppercase">ACTIVE</span>
+                          </div>
+                          <div class="font-extrabold text-sm text-white mt-0.5 group-hover:text-[#EF5A24] transition-colors">{{ tele.label }}</div>
+                        </div>
                       </div>
-                    </div>
-                    
-                    <div class="text-right flex flex-col items-end">
-                      <span class="text-[10px] font-technical text-white/80 font-bold">LABS: {{ tele.labsCount }}</span>
-                      <span class="text-[9px] font-technical text-white/40 mt-0.5">UNITS: {{ tele.equipCount }}</span>
-                    </div>
-                  </button>
-                </div>
-              </div>
-
-              <!-- State B: Building Floor details view -->
-              <div v-else class="flex flex-col gap-4">
-                <div class="flex items-center gap-2">
-                  <button @click="resetToCampus" class="text-[#EF5A24] text-xs hover:underline">← CAMPUS</button>
-                  <span class="text-white/30 text-xs">/</span>
-                  <span class="text-xs text-white/60 uppercase font-bold">{{ selectedBuilding.replace('-', ' ') }}</span>
-                </div>
-
-                <h2 class="text-lg font-bold text-white">Floor {{ selectedFloor }} Rooms</h2>
-                <div class="flex flex-col gap-2 mt-2">
-                  <button 
-                    v-for="room in filteredRooms" 
-                    :key="room.room_id"
-                    @click="selectRoom(room.room_id)"
-                    :class="[
-                      'flex flex-col gap-1 p-3 rounded-lg border text-left text-xs transition-all duration-300',
-                      selectedRoomId === room.room_id
-                        ? 'bg-[#EF5A24]/10 border-[#EF5A24] text-[#EF5A24]'
-                        : 'bg-[#0F1E36]/50 border-white/5 hover:border-white/20'
-                    ]"
-                  >
-                    <div class="font-bold text-white flex justify-between">
-                      <span>{{ room.room_id.toUpperCase() }}</span>
-                      <span class="text-[9px] text-[#06B6D4] font-technical uppercase font-normal">{{ room.status }}</span>
-                    </div>
-                    <div class="text-[11px] text-white/60 line-clamp-1 mt-1">{{ room.name }}</div>
-                  </button>
-                  <div v-if="!filteredRooms.length" class="text-xs text-white/40 italic py-4">
-                    No laboratories populated on this floor yet.
+                      
+                      <div class="text-right flex flex-col items-end">
+                        <span class="text-[10px] font-technical text-white/80 font-bold">LABS: {{ tele.labsCount }}</span>
+                        <span class="text-[9px] font-technical text-white/40 mt-0.5">UNITS: {{ tele.equipCount }}</span>
+                      </div>
+                    </button>
                   </div>
                 </div>
-              </div>
+
+                <!-- State B: Building Floor details view -->
+                <div v-else class="flex flex-col gap-4" key="building">
+                  <div class="flex items-center gap-2">
+                    <button @click="resetToCampus" class="text-[#EF5A24] text-xs hover:underline">← CAMPUS</button>
+                    <span class="text-white/30 text-xs">/</span>
+                    <span class="text-xs text-white/60 uppercase font-bold">{{ selectedBuilding.replace('-', ' ') }}</span>
+                  </div>
+
+                  <h2 class="text-lg font-bold text-white">Floor {{ selectedFloor }} Rooms</h2>
+                  <TransitionGroup name="list-fade" tag="div" class="flex flex-col gap-2 mt-2">
+                    <button 
+                      v-for="room in filteredRooms" 
+                      :key="room.room_id"
+                      @click="selectRoom(room.room_id)"
+                      :class="[
+                        'flex flex-col gap-1 p-3 rounded-lg border text-left text-xs transition-all duration-300',
+                        selectedRoomId === room.room_id
+                          ? 'bg-[#EF5A24]/10 border-[#EF5A24] text-[#EF5A24]'
+                          : 'bg-[#0F1E36]/50 border-white/5 hover:border-white/20'
+                      ]"
+                    >
+                      <div class="font-bold text-white flex justify-between">
+                        <span>{{ room.room_id.toUpperCase() }}</span>
+                        <span class="text-[9px] text-[#06B6D4] font-technical uppercase font-normal">{{ room.status }}</span>
+                      </div>
+                      <div class="text-[11px] text-white/60 line-clamp-1 mt-1">{{ room.name }}</div>
+                    </button>
+                    <div v-if="!filteredRooms.length" key="no-rooms" class="text-xs text-white/40 italic py-4">
+                      No laboratories populated on this floor yet.
+                    </div>
+                  </TransitionGroup>
+                </div>
+              </Transition>
             </div>
           </div>
         </aside>
 
         <!-- Interactive Map Canvas -->
-        <div :class="['flex-grow relative z-10 transition-all duration-300', isMapFullscreen ? 'h-full w-full' : 'h-2/3 md:h-full w-full']">
+        <div :class="['flex-grow relative z-10 transition-all duration-300', isMapFullscreen ? 'h-full w-full' : 'h-2/3 md:h-full w-full landscape:h-full landscape:w-auto']">
           <!-- Floating Fullscreen Toggle Button on Mobile -->
           <button 
             @click="isMapFullscreen = !isMapFullscreen" 
@@ -172,11 +174,10 @@
           />
         </div>
 
-        <!-- Room Detail Sidebar Drawer (Highlighted Machines Only) -->
         <Transition name="slide-in">
           <div 
             v-if="selectedRoomDetail" 
-            class="absolute top-0 right-0 z-30 w-full md:w-[420px] h-full bg-[#070A12]/95 border-l border-[#EF5A24]/30 flex flex-col shadow-2xl"
+            class="absolute top-0 right-0 z-30 w-full landscape:w-80 md:w-[420px] h-full bg-[#070A12]/95 border-l border-[#EF5A24]/30 flex flex-col shadow-2xl"
             style="view-transition-name: room-drawer"
           >
             <!-- Drawer Header -->
@@ -199,7 +200,7 @@
             <!-- Drawer Content -->
             <div class="flex-grow overflow-y-auto p-5 flex flex-col gap-6">
               <!-- Room Preview Image -->
-              <div class="relative w-full h-44 bg-slate-950 rounded-xl overflow-hidden border border-white/10 shrink-0 select-none">
+              <div class="relative w-full h-44 landscape:h-28 bg-slate-950 rounded-xl overflow-hidden border border-white/10 shrink-0 select-none">
                 <NuxtImg 
                   :src="labImages[0]" 
                   format="avif"

@@ -1,7 +1,7 @@
 <template>
   <div class="relative w-screen h-screen bg-[#070A12] text-white flex flex-col overflow-hidden font-sans">
     <!-- Navbar / Cyber HUD Bar -->
-    <header class="h-16 border-b border-[#EF5A24]/20 bg-[#0F1E36]/80 backdrop-blur-md px-6 flex items-center justify-between z-30 shrink-0">
+    <header class="h-16 landscape:h-11 border-b border-[#EF5A24]/20 bg-[#0F1E36]/80 backdrop-blur-md px-6 flex items-center justify-between z-30 shrink-0 transition-all duration-300">
       <div class="flex items-center gap-3">
         <!-- VGU Branded Badge -->
         <div class="bg-[#EF5A24] text-white px-3 py-1 rounded-md text-sm font-technical font-extrabold uppercase tracking-wider shadow-[0_0_10px_#EF5A24]">
@@ -17,12 +17,12 @@
       <div class="flex items-center gap-2 sm:gap-4">
         <button 
           @click="goToMap" 
-          class="px-2.5 py-1 sm:px-4 sm:py-1.5 rounded-lg text-[10px] sm:text-xs font-technical border border-white/15 text-white/60 hover:text-white transition-all duration-300 cursor-pointer"
+          class="px-2.5 py-1 sm:px-4 sm:py-1.5 landscape:py-0.5 landscape:px-2 rounded-lg text-[10px] sm:text-xs landscape:text-[9px] font-technical border border-white/15 text-white/60 hover:text-white transition-all duration-300 cursor-pointer"
         >
           INTERACTIVE MAP
         </button>
         <button 
-          class="px-2.5 py-1 sm:px-4 sm:py-1.5 rounded-lg text-[10px] sm:text-xs font-technical border bg-[#EF5A24]/10 border-[#EF5A24] text-[#EF5A24] transition-all duration-300"
+          class="px-2.5 py-1 sm:px-4 sm:py-1.5 landscape:py-0.5 landscape:px-2 rounded-lg text-[10px] sm:text-xs landscape:text-[9px] font-technical border bg-[#EF5A24]/10 border-[#EF5A24] text-[#EF5A24] transition-all duration-300"
         >
           ALL INSTRUMENTS
         </button>
