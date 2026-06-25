@@ -112,29 +112,81 @@ body {
   background: rgba(239, 90, 36, 0.6);
 }
 
-/* Custom View Transitions API Customizations */
-::view-transition-old(root),
+/* ─── View Transitions API ─────────────────────────────────────────────────── */
+
+/* Root page transition: fade with a subtle upward slide */
+@keyframes vt-fade-out {
+  from { opacity: 1; transform: translateY(0); }
+  to   { opacity: 0; transform: translateY(-6px); }
+}
+@keyframes vt-fade-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+::view-transition-old(root) {
+  animation: vt-fade-out 0.3s cubic-bezier(0.4, 0, 0.2, 1) both;
+}
 ::view-transition-new(root) {
-  animation-duration: 0.45s;
-  animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+  animation: vt-fade-in 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
-::view-transition-old(room-image),
+/* Shared element: lab room image — cross-morphs smoothly */
+::view-transition-group(room-image) {
+  animation-duration: 0.55s;
+  animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+}
+::view-transition-old(room-image) {
+  animation: vt-fade-out 0.25s cubic-bezier(0.4, 0, 1, 1) both;
+}
 ::view-transition-new(room-image) {
+  animation: vt-fade-in 0.45s cubic-bezier(0.16, 1, 0.3, 1) 0.05s both;
+}
+
+/* Shared element: room title — slides from left */
+@keyframes vt-title-out {
+  from { opacity: 1; transform: translateX(0); }
+  to   { opacity: 0; transform: translateX(-12px); }
+}
+@keyframes vt-title-in {
+  from { opacity: 0; transform: translateX(12px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+::view-transition-group(room-title) {
   animation-duration: 0.5s;
   animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
 }
-
-::view-transition-old(room-title),
+::view-transition-old(room-title) {
+  animation: vt-title-out 0.22s cubic-bezier(0.4, 0, 1, 1) both;
+}
 ::view-transition-new(room-title) {
-  animation-duration: 0.5s;
-  animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+  animation: vt-title-in 0.45s cubic-bezier(0.16, 1, 0.3, 1) 0.08s both;
 }
 
-::view-transition-old(room-drawer),
-::view-transition-new(room-drawer) {
-  animation-duration: 0.5s;
+/* Shared element: drawer panel — slides from right */
+@keyframes vt-drawer-out {
+  from { opacity: 1; transform: translateX(0); }
+  to   { opacity: 0; transform: translateX(16px); }
+}
+@keyframes vt-drawer-in {
+  from { opacity: 0; transform: translateX(-16px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+::view-transition-group(room-drawer) {
+  animation-duration: 0.55s;
   animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+}
+::view-transition-old(room-drawer) {
+  animation: vt-drawer-out 0.22s cubic-bezier(0.4, 0, 1, 1) both;
+}
+::view-transition-new(room-drawer) {
+  animation: vt-drawer-in 0.5s cubic-bezier(0.16, 1, 0.3, 1) 0.05s both;
+}
+
+/* Prevent view-transition from hiding overflow during morph */
+::view-transition-image-pair(room-image),
+::view-transition-image-pair(room-drawer) {
+  isolation: auto;
 }
 
 /* Cyber Button with Sliding Hover Label */

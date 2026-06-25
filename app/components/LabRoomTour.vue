@@ -57,7 +57,8 @@
       v-else
       ref="scrollContainer"
       @scroll="handleScroll"
-      class="flex-grow snap-y snap-mandatory scroll-smooth overflow-y-auto w-full h-full"
+      class="flex-grow snap-y snap-mandatory overflow-y-auto w-full h-full overscroll-y-none"
+      style="-webkit-overflow-scrolling: touch;"
     >
       <!-- Slide 0: Lab Overview / Introduction -->
       <section class="h-auto lg:h-screen w-full snap-none lg:snap-start shrink-0 relative flex flex-col lg:flex-row lg:pt-16 bg-[#070A12]">
@@ -646,14 +647,18 @@ function scrollToTop() {
 }
 
 function scrollToActiveMachine() {
+  // Only auto-scroll if there's an explicit mach query param (user navigated via URL)
   if (!route.query.mach || !props.equipment.length || !scrollContainer.value) return
   const targetId = route.query.mach
   const targetIdx = props.equipment.findIndex(mach => getCleanId(mach) === targetId)
   if (targetIdx !== -1) {
     const slideIdx = targetIdx + (isMobileView.value ? 2 : 1)
-    setTimeout(() => {
-      scrollToNext(slideIdx, false)
-    }, 100)
+    // Use requestAnimationFrame to ensure layout is fully painted before scrolling
+    requestAnimationFrame(() => {
+      setTimeout(() => {
+        scrollToNext(slideIdx, false)
+      }, 150)
+    })
   }
 }
 
@@ -662,12 +667,18 @@ onMounted(() => {
   if (route.query.view === '3d') {
     viewMode.value = '3d'
   }
-  scrollToActiveMachine()
+  // Only scroll to a machine if the URL explicitly specifies one
+  if (route.query.mach) {
+    scrollToActiveMachine()
+  }
 })
 
-// Scroll if equipment array changes later
-watch(() => props.equipment, () => {
-  scrollToActiveMachine()
+// Watch equipment changes but only scroll if URL has mach param AND not already at correct slide
+watch(() => props.equipment, (newEquip, oldEquip) => {
+  // Only trigger if equipment list just loaded for the first time (was empty before)
+  if (!oldEquip?.length && newEquip?.length && route.query.mach) {
+    scrollToActiveMachine()
+  }
 }, { deep: true })
 
 // Targeting crosshair coordinate calculations
